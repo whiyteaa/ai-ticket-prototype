@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>语义槽位配置 · 演示 — AI 售后台</title>
+<link rel="stylesheet" href="vendor/fonts/noto-sans-sc.css"/>
+<link rel="stylesheet" href="vendor/phosphor/regular.css"/>
+<link rel="stylesheet" href="vendor/phosphor/fill.css"/>
+<style>
+:root{
+  --brand:#2454FF;--brand-deep:#2454FF;--brand-light:#F0F4FF;--brand-accent:#7B9FFF;
+  --ink:#1D2129;--muted:#86909C;--line:#EEF0F5;--bg:#F6F7F9;--bg-soft:#F7F8FA;
+  --ok:#0fbf4f;--warn:#d49000;--danger:#f53f3f;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans SC Variable","Noto Sans SC","PingFang SC","HarmonyOS Sans SC","MiSans","Microsoft YaHei UI","Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.65;font-variant-numeric:tabular-nums;overflow:hidden;
+}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:#D6DBE4;border-radius:4px;}
+::selection{background:rgba(36,84,255,.14);}
+#app{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* 顶栏 */
+.topbar{height:54px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:12px;flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:9px;}
+.logo-ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2454FF,#4d74ff);color:#fff;display:grid;place-items:center;font-size:16px;box-shadow:0 3px 8px rgba(36,84,255,.28);}
+.logo b{font-size:14.5px;font-weight:700;}
+.env{font-size:10.5px;color:var(--brand-deep);background:var(--brand-light);border-radius:999px;padding:1px 8px;font-weight:600;}
+.back-link{margin-left:auto;font-size:12.5px;color:var(--muted);text-decoration:none;display:inline-flex;gap:5px;align-items:center;cursor:pointer;}
+.back-link:hover{color:var(--brand-deep);}
+
+.main{flex:1;min-height:0;overflow-y:auto;padding:20px 24px 30px;}
+/* 说明条 */
+.intro{background:linear-gradient(135deg,#F0F4FF,#F7FAFF);border:1px solid #D9E2FF;border-radius:13px;padding:14px 18px;margin-bottom:16px;display:flex;gap:11px;align-items:flex-start;font-size:13px;color:#33406B;line-height:1.8;}
+.intro i{font-size:19px;color:var(--brand-deep);margin-top:3px;}
+.intro b{color:var(--brand-deep);}
+
+.grid{display:grid;grid-template-columns:minmax(480px,1.15fr) minmax(400px,1fr);gap:16px;align-items:start;}
+
+.card{background:#fff;border-radius:13px;box-shadow:0 1px 2px rgba(29,33,41,.05),0 6px 16px rgba(29,33,41,.08);}
+.card-pad{padding:17px 19px;}
+.card-title{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:650;margin-bottom:3px;}
+.card-title i{color:var(--brand);font-size:17px;}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:13px;}
+
+.btn{display:inline-flex;align-items:center;gap:6px;font-weight:500;border-radius:8px;padding:7px 15px;transition:all .2s;cursor:pointer;border:1px solid transparent;font-size:13px;line-height:1.2;white-space:nowrap;font-family:inherit;}
+.btn-primary{background:var(--brand-deep);color:#fff;}
+.btn-primary:not(:disabled):hover{background:#1a40e0;}
+.btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);}
+.btn-ghost:not(:disabled):hover{background:var(--bg-soft);border-color:var(--brand-accent);}
+.btn-sm{padding:4px 11px;font-size:12px;border-radius:6px;}
+
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 10px;border-radius:999px;font-size:11.5px;font-weight:500;line-height:1.7;white-space:nowrap;}
+.tag-blue{background:var(--brand-light);color:var(--brand-deep);}
+.tag-gray{background:#f2f3f5;color:var(--muted);}
+.tag-green{background:#e8ffea;color:#0a9f40;}
+.tag-orange{background:#fff7e6;color:#d49000;}
+.tag-teal{background:#e6fffa;color:#0c8b7a;}
+
+/* 槽位清单 */
+.grp-label{font-size:11px;font-weight:700;color:#A9B0BC;letter-spacing:2px;padding:12px 2px 5px;display:flex;align-items:center;gap:8px;}
+.grp-label .sp{flex:1;}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.tbl th{text-align:left;color:var(--muted);font-weight:500;font-size:11px;padding:9px 10px;border-bottom:1px solid var(--line);background:var(--bg-soft);white-space:nowrap;}
+.tbl th:first-child{border-radius:8px 0 0 8px;}
+.tbl th:last-child{border-radius:0 8px 8px 0;}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.tbl tr.slot-row{cursor:pointer;transition:background .15s;}
+.tbl tr.slot-row:hover{background:var(--brand-light);}
+.tbl tr:last-child td{border-bottom:0;}
+.slot-name{font-weight:600;display:flex;align-items:center;gap:7px;}
+.type-pill{font-size:10.5px;border-radius:6px;padding:1px 7px;font-weight:600;}
+.tp-enum{background:#EEF4FF;color:#3D6BFF;}
+.tp-text{background:#F2F3F5;color:#5d6470;}
+.tp-bool{background:#E6FFFA;color:#0c8b7a;}
+.tp-time{background:#FFF4D6;color:#d49000;}
+.tp-num{background:#FDF0EC;color:#d4622a;}
+.refs{font-size:10.5px;color:var(--muted);}
+/* 展开详情行 */
+.detail-row{display:none;background:var(--bg-soft);}
+.detail-row.open{display:table-row;}
+.detail-row td{padding:12px 14px;}
+.ex-item{display:flex;gap:8px;font-size:12px;color:#4A5578;padding:3px 0;align-items:flex-start;}
+.ex-item i{color:var(--brand);margin-top:2px;}
+
+/* 新建槽位表单 */
+.field-label{font-size:12px;font-weight:600;margin:12px 0 5px;display:flex;align-items:center;gap:5px;}
+.field-label .req{color:var(--danger);}
+.field{width:100%;border:1px solid transparent;border-radius:8px;padding:8px 11px;background:var(--bg-soft);outline:none;font-size:13px;transition:all .2s;font-family:inherit;color:var(--ink);}
+.field:focus{background:#fff;border-color:var(--brand-deep);box-shadow:0 0 0 3px rgba(36,84,255,.12);}
+select.field{appearance:auto;cursor:pointer;}
+textarea.field{line-height:1.6;resize:vertical;min-height:58px;}
+
+/* 抽取演示 */
+.demo-text{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:13px;line-height:1.7;background:var(--bg-soft);outline:none;font-family:inherit;min-height:88px;resize:vertical;color:var(--ink);}
+.demo-text:focus{background:#fff;border-color:var(--brand);}
+.extract-btn{margin-top:10px;width:100%;justify-content:center;padding:10px;font-size:13.5px;font-weight:600;}
+/* 结果 */
+.ex-result{margin-top:14px;display:none;}
+.ex-result.show{display:block;}
+.slot-line{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px;background:#fff;animation:rise .3s ease both;}
+@keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.slot-line .nm{width:88px;flex-shrink:0;font-size:12.5px;font-weight:600;}
+.slot-line .val{flex:1;min-width:0;font-size:12.5px;}
+.slot-line .val .quote{display:block;font-size:10.5px;color:var(--muted);font-style:normal;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slot-line .val.empty{color:#B3BAC6;}
+.conf{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.conf-bar{width:52px;height:5px;border-radius:3px;background:#EDF0F5;overflow:hidden;}
+.conf-bar span{display:block;height:100%;border-radius:3px;}
+.conf b{font-size:11px;font-variant-numeric:tabular-nums;width:30px;text-align:right;}
+.conf-hi span{background:var(--ok);} .conf-hi b{color:#0a9f40;}
+.conf-mid span{background:var(--warn);} .conf-mid b{color:#d49000;}
+.conf-lo span{background:#C6CFDE;} .conf-lo b{color:#98A1B0;}
+.disp{flex-shrink:0;font-size:10.5px;border-radius:999px;padding:1px 8px;font-weight:600;white-space:nowrap;}
+.disp-auto{background:#e8ffea;color:#0a9f40;}
+.disp-card{background:#fff7e6;color:#d49000;}
+.disp-todo{background:#f2f3f5;color:var(--muted);}
+/* 规则命中 */
+.rule-hit{border:1px solid #FFE3C2;background:#FFFBF4;border-radius:10px;padding:11px 13px;margin-top:4px;font-size:12px;color:#6B4A12;line-height:1.7;animation:rise .3s ease both;}
+.rule-hit b{color:#b06a00;}
+.rule-hit.auto{border-color:#CDE4D6;background:#F6FCF8;color:#2A5B41;}
+.rule-hit.auto b{color:#0a7a3a;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted);align-items:center;}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-1px;}
+</style>
+<script src="gate.js"></script></head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-ic"><i class="ph-fill ph-sliders-horizontal"></i></div>
+      <b>语义槽位配置</b><span class="env">演示 DEMO · 独立页面</span>
+    </div>
+    <a class="back-link" href="admin.html"><i class="ph ph-arrow-left"></i>返回管理端</a>
+  </header>
+
+  <main class="main">
+    <div class="intro">
+      <i class="ph ph-lightbulb"></i>
+      <div><b>工单不设固定表单。</b>租户声明"槽位"（想要的结构化信息），AI 从用户的自由描述中自动提取、标注<b>置信度</b>并附<b>原话引用</b>；槽位是触发器与调度的锚点：高置信自动生效、中置信转协同卡人工确认、提取不到就标"待补"，<b>不阻塞工单流转</b>。</div>
+    </div>
+
+    <div class="grid">
+      <!-- 左：槽位清单 -->
+      <div class="card card-pad">
+        <div class="card-title"><i class="ph ph-list-magnifying-glass"></i>槽位清单 <span class="tag tag-gray" style="margin-left:6px">14 / 20</span></div>
+        <div class="card-sub">行业预置 12 个 + 自定义 2 个（上限 20）· 点击行查看抽取示例与消费方</div>
+        <div class="grp-label">行业预置 · 连锁型模板<span class="sp"></span><span class="tag tag-blue">可停用</span></div>
+        <table class="tbl">
+          <thead><tr><th>槽位</th><th>类型</th><th>被消费于</th><th>状态</th></tr></thead>
+          <tbody id="presetBody"></tbody>
+        </table>
+        <div class="grp-label">自定义槽位<span class="sp"></span><button class="btn btn-sm btn-primary" onclick="scrollToNew()"><i class="ph ph-plus"></i>新建槽位</button></div>
+        <table class="tbl">
+          <thead><tr><th>槽位</th><th>类型</th><th>被消费于</th><th>状态</th></tr></thead>
+          <tbody id="customBody"></tbody>
+        </table>
+      </div>
+
+      <!-- 右列 -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- 新建槽位 -->
+        <div class="card card-pad" id="newSlotCard">
+          <div class="card-title"><i class="ph ph-plus-circle"></i>新建槽位（租户管理员声明）</div>
+          <div class="card-sub">声明"名称 + 类型 + 抽取示例"，AI 下次提取即纳入 —— 这就是"每家公司字段要求不同"的解法</div>
+          <div class="field-label">槽位名称 <span class="req">*</span></div>
+          <input class="field" id="nsName" placeholder="如：是否新装网点 / 合同编号 / 门店装修状态"/>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div class="field-label">类型 <span class="req">*</span></div>
+              <select class="field" id="nsType"><option>枚举（单选）</option><option>文本</option><option>数值</option><option>布尔（是/否）</option><option>时间窗</option></select></div>
+            <div><div class="field-label">被消费于</div>
+              <select class="field" id="nsUse"><option>触发器 + 调度</option><option>仅调度参考</option><option>仅展示 / 统计</option></select></div>
+          </div>
+          <div class="field-label">抽取示例（1–3 条，帮 AI 校准口径）<span class="req">*</span></div>
+          <textarea class="field" id="nsEx" placeholder="每行一条：原话 → 期望值&#10;例：这家店上个月刚装修完 → 是"></textarea>
+          <div style="display:flex;gap:9px;margin-top:13px">
+            <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveSlot()"><i class="ph ph-check"></i>保存并生效（下次提取纳入）</button>
+            <button class="btn btn-ghost" onclick="resetNew()">清空</button>
+          </div>
+        </div>
+
+        <!-- 抽取演示 -->
+        <div class="card card-pad">
+          <div class="card-title"><i class="ph ph-magic-wand"></i>抽取效果演示</div>
+          <div class="card-sub">改写或直接使用下面这段自由描述，点"模拟 AI 提取"，看槽位如何被提取与处置（演示为固定剧本）</div>
+          <textarea class="demo-text" id="demoText">天府三街店的佳博打印机又不出单了，屏幕上错误码 E-03，上周才修过一次又坏，店长说再修不好他就要打 12315 投诉了，最好今天下午派人过来。</textarea>
+          <button class="btn btn-primary extract-btn" id="exBtn" onclick="extract()"><i class="ph ph-sparkle"></i>模拟 AI 提取</button>
+          <div class="ex-result" id="exResult">
+            <div id="exLines"></div>
+            <div id="exRules"></div>
+            <div class="legend">
+              <span><i style="background:var(--ok)"></i>≥0.90 自动生效（留痕可回滚）</span>
+              <span><i style="background:var(--warn)"></i>0.70–0.90 转协同卡人工确认</span>
+              <span><i style="background:#C6CFDE"></i>&lt;0.70 仅参考 / 待补</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ===== 槽位数据 ===== */
+const PRESETS=[
+ {n:'设备类型',t:'枚举',tp:'enum',use:'分派技能匹配 · 统计',on:true,ex:['小票机不出单 → 打印机','收银那个黑屏了 → 收银机','门口球机离线 → 监控']},
+ {n:'设备型号',t:'文本',tp:'text',use:'配件准备 · 相似案例',on:true,ex:['佳博 GP-C802V 打印机 → GP-C802V','海康那个球机 → DS-2DC 系列（待补）']},
+ {n:'资产编号',t:'文本',tp:'text',use:'台账关联 · 保修判断',on:true,ex:['机器上贴的 GB01198 → GB01198']},
+ {n:'故障现象',t:'短文本',tp:'text',use:'相似案例 · 知识沉淀',on:true,ex:['亮红灯打不出小票 → 红灯常亮·不出单']},
+ {n:'错误码',t:'文本',tp:'text',use:'知识库精确命中',on:true,ex:['屏幕显示 E-03 → E-03']},
+ {n:'已尝试步骤',t:'列表',tp:'text',use:'工程师上门前判断',on:true,ex:['重启过了也不行 → 重启']},
+ {n:'期望上门时间',t:'时间窗',tp:'time',use:'排程',on:true,ex:['最好今天下午 → 今天 12:00–18:00']},
+ {n:'是否投诉',t:'布尔',tp:'bool',use:'触发器：直派调度岗+通知',on:true,ex:['我要投诉 → 是','再修不好就打 12315 → 风险','跟你们领导说 → 疑似']},
+ {n:'紧急度信号',t:'枚举',tp:'enum',use:'优先级建议输入',on:true,ex:['整个店开不了单 → 停业','就一台收银机坏了 → 影响经营']},
+ {n:'情绪',t:'枚举',tp:'enum',use:'人工服务台提示 · 回访策略',on:true,ex:['太耽误事了 → 着急','你们怎么回事！ → 愤怒']},
+ {n:'反复故障',t:'布尔',tp:'bool',use:'升级处理 · 质量分析',on:true,ex:['上周才修过又坏 → 是']},
+ {n:'保修状态',t:'枚举',tp:'enum',use:'结算（P1）',on:true,ex:['机器是去年买的 → 待查台账']}
+];
+let CUSTOMS=[
+ {n:'是否新装网点',t:'布尔（是/否）',tp:'bool',use:'触发器：新装 30 天内优先响应',on:true,ex:['这家店上个月刚开业 → 是']},
+ {n:'合同编号',t:'文本',tp:'text',use:'结算关联（P1）',on:true,ex:['按 HT-2026-88 那个合同结算 → HT-2026-88']}
+];
+function typePill(t){const map={'enum':'tp-enum','text':'tp-text','bool':'tp-bool','time':'tp-time'};return map[t]||'tp-text';}
+function rowHTML(s,isCustom,idx){
+ return `<tr class="slot-row" onclick="toggleDetail(this)">
+   <td><span class="slot-name">${isCustom?'<i class="ph-fill ph-star-and-crescent" style="color:#d49000;font-size:11px"></i>':''}${s.n}</span></td>
+   <td><span class="type-pill ${typePill(s.tp)}">${s.t}</span></td>
+   <td class="refs">${s.use}</td>
+   <td><span class="tag ${s.on?'tag-green':'tag-gray'}" style="cursor:pointer" onclick="event.stopPropagation();this.className='tag '+(this.classList.contains('tag-green')?'tag-gray':'tag-green');this.textContent=this.textContent==='启用'?'停用':'启用'">${s.on?'启用':'停用'}</span></td>
+ </tr>
+ <tr class="detail-row"><td colspan="4">
+   <div style="font-size:11px;font-weight:700;color:#A9B0BC;letter-spacing:1.5px;margin-bottom:5px">抽取示例（AI 校准口径）</div>
+   ${s.ex.map(e=>`<div class="ex-item"><i class="ph ph-quotes"></i><span>"${e.split(' → ')[0]}" → <b>${e.split(' → ')[1]||'—'}</b></span></div>`).join('')}
+ </td></tr>`;
+}
+function render(){
+  document.getElementById('presetBody').innerHTML=PRESETS.map((s,i)=>rowHTML(s,false,i)).join('');
+  document.getElementById('customBody').innerHTML=CUSTOMS.map((s,i)=>rowHTML(s,true,i)).join('');
+}
+function toggleDetail(tr){tr.nextElementSibling.classList.toggle('open');}
+function scrollToNew(){document.getElementById('newSlotCard').scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('nsName').focus();}
+function saveSlot(){
+  const n=document.getElementById('nsName').value.trim();
+  const t=document.getElementById('nsType').value;
+  const u=document.getElementById('nsUse').value;
+  const ex=document.getElementById('nsEx').value.trim();
+  if(!n){toast('请填写槽位名称');return;}
+  if(!ex){toast('请至少提供 1 条抽取示例（帮 AI 校准口径）');return;}
+  const tpMap={'枚举（单选）':'enum','文本':'text','数值':'num','布尔（是/否）':'bool','时间窗':'time'};
+  CUSTOMS.unshift({n,t,tp:tpMap[t]||'text',use:u,on:true,ex:ex.split('\n').filter(x=>x.trim()).slice(0,3)});
+  render();resetNew();
+  toast(`槽位「${n}」已保存 —— 下次 AI 提取即纳入`);
+}
+function resetNew(){['nsName','nsEx'].forEach(id=>document.getElementById(id).value='');}
+/* ===== 抽取演示（固定剧本） ===== */
+const EXTRACT=[
+ {nm:'设备类型',val:'打印机',q:'"佳博打印机"',c:0.97,d:'auto'},
+ {nm:'错误码',val:'E-03',q:'"屏幕上错误码 E-03"',c:0.99,d:'auto'},
+ {nm:'反复故障',val:'是',q:'"上周才修过一次又坏"',c:0.88,d:'auto'},
+ {nm:'期望上门时间',val:'今天 12:00–18:00',q:'"最好今天下午派人过来"',c:0.91,d:'auto'},
+ {nm:'是否投诉',val:'风险',q:'"再修不好他就要打 12315 投诉了"',c:0.71,d:'card'},
+ {nm:'情绪',val:'着急',q:'"店长说…就要投诉了"',c:0.82,d:'card'},
+ {nm:'设备型号',val:'',q:'',d:'todo'},
+ {nm:'资产编号',val:'',q:'',d:'todo'}
+];
+const RULES=[
+ {auto:false,html:'<b>规则命中（中置信 → 转协同卡）：</b>是否投诉 = 风险（0.71，阈值区间 0.70–0.90）→ 生成协同卡「疑似投诉，建议优先级≥高 + 直派调度岗 + 通知管理员」，调度员一键确认后执行。'},
+ {auto:true,html:'<b>自动执行（高置信留痕）：</b>错误码 E-03（0.99）命中知识库《收银设备故障处理手册》§3.2 → 已附到工程师端"相似案例"；期望时间（0.91）已进入排程建议。'}
+];
+function confCls(c){return c>=0.9?'conf-hi':(c>=0.7?'conf-mid':'conf-lo');}
+function barColor(c){return c>=0.9?'var(--ok)':(c>=0.7?'var(--warn)':'#C6CFDE');}
+function extract(){
+  const box=document.getElementById('exResult');
+  const lines=document.getElementById('exLines');
+  const rules=document.getElementById('exRules');
+  box.classList.add('show');lines.innerHTML='';rules.innerHTML='';
+  const btn=document.getElementById('exBtn');
+  btn.disabled=true;btn.innerHTML='<i class="ph ph-circle-notch" style="animation:spin 1s linear infinite"></i>AI 正在提取槽位…';
+  const style=document.createElement('style');style.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(style);
+  EXTRACT.forEach((e,i)=>{
+    setTimeout(()=>{
+      const conf=e.d==='todo'?'':`<span class="conf ${confCls(e.c)}"><span class="conf-bar"><span style="width:${Math.round(e.c*100)}%;background:${barColor(e.c)}"></span></span><b>${e.c.toFixed(2)}</b></span>`;
+      const disp=e.d==='auto'?'<span class="disp disp-auto">自动生效</span>':(e.d==='card'?'<span class="disp disp-card">转协同卡</span>':'<span class="disp disp-todo">待补 · 不阻塞流转</span>');
+      lines.insertAdjacentHTML('beforeend',`<div class="slot-line">
+        <span class="nm">${e.nm}</span>
+        <span class="val ${e.val?'':'empty'}">${e.val||'（描述中未提及）'}${e.q?`<span class="quote">${e.q}</span>`:''}</span>
+        ${conf}${disp}
+      </div>`);
+    },450+i*130);
+  });
+  setTimeout(()=>{
+    RULES.forEach((r,i)=>{setTimeout(()=>rules.insertAdjacentHTML('beforeend',`<div class="rule-hit ${r.auto?'auto':''}">${r.html}</div>`),i*200);});
+    btn.disabled=false;btn.innerHTML='<i class="ph ph-arrow-counter-clockwise"></i>重新提取';
+  },450+EXTRACT.length*130+150);
+}
+let toastTimer;
+function toast(t){
+  let el=document.querySelector('.toast');
+  if(!el){el=document.createElement('div');el.className='toast';el.style.cssText='position:fixed;top:18px;left:50%;transform:translate(-50%,-80px);background:#1D2129;color:#fff;font-size:13px;border-radius:10px;padding:9px 18px;display:flex;gap:8px;align-items:center;box-shadow:0 8px 28px rgba(29,33,41,.3);z-index:60;transition:transform .3s ease;white-space:nowrap;';el.innerHTML='<i class="ph-fill ph-check-circle" style="color:#5BE49B"></i><span></span>';document.body.appendChild(el);}
+  el.querySelector('span').textContent=t;
+  el.style.transform='translate(-50%,0)';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.transform='translate(-50%,-80px)',2600);
+}
+render();
+</script>
+</body>
+</html>

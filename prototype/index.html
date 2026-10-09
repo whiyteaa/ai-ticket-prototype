@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>智能售后工单助手 · 三端高保真原型</title>
+<link rel="stylesheet" href="vendor/fonts/noto-sans-sc.css"/>
+<link rel="stylesheet" href="vendor/phosphor/regular.css"/>
+<link rel="stylesheet" href="vendor/phosphor/fill.css"/>
+<style>
+:root{
+  --brand:#2454FF;--brand-deep:#2454FF;--brand-light:#F0F4FF;--brand-accent:#7B9FFF;
+  --ink:#1D2129;--muted:#86909C;--line:#EEF0F5;--bg:#F6F7F9;--bg-soft:#F7F8FA;
+  --ok:#0fbf4f;--warn:#d49000;--danger:#f53f3f;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans SC Variable","Noto Sans SC","PingFang SC","HarmonyOS Sans SC","MiSans","Microsoft YaHei UI","Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.65;font-variant-numeric:tabular-nums;
+  min-height:100vh;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:44px 28px 60px;}
+/* 头部 */
+.hero{display:flex;align-items:flex-end;gap:18px;margin-bottom:8px;}
+.hero-logo{width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#2454FF,#4d74ff);color:#fff;display:grid;place-items:center;font-size:30px;box-shadow:0 10px 26px rgba(36,84,255,.32);}
+.hero h1{font-size:26px;font-weight:750;letter-spacing:.2px;}
+.hero .sub{color:var(--muted);font-size:13.5px;margin-top:2px;}
+.hero .ver{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 11px;border-radius:999px;font-size:12px;font-weight:500;line-height:1.7;white-space:nowrap;}
+.tag-blue{background:var(--brand-light);color:var(--brand-deep);}
+.tag-gray{background:#f2f3f5;color:var(--muted);}
+.tag-green{background:#e8ffea;color:#0a9f40;}
+.lead{color:var(--muted);font-size:13.5px;margin:14px 0 26px;max-width:760px;}
+.lead b{color:var(--ink);font-weight:650;}
+/* 三端卡片 */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:30px;}
+.pcard{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(29,33,41,.05),0 10px 30px rgba(29,33,41,.08);transition:all .25s ease;display:flex;flex-direction:column;border:1px solid transparent;}
+.pcard:hover{transform:translateY(-4px);border-color:var(--brand-accent);box-shadow:0 6px 16px -4px rgba(36,84,255,.12),0 18px 44px rgba(29,33,41,.14);}
+.pcard .visor{height:132px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.v-user{background:linear-gradient(150deg,#EEF3FF 0%,#F6F8FF 60%,#fff 100%);}
+.v-admin{background:linear-gradient(150deg,#E9EEFB 0%,#F2F5FC 60%,#fff 100%);}
+.v-eng{background:linear-gradient(150deg,#E5ECFB 0%,#EEF2FB 60%,#fff 100%);}
+.miniui{width:82%;height:104px;background:rgba(255,255,255,.9);border:1px solid #E3E9F5;border-radius:12px;box-shadow:0 8px 22px rgba(29,33,41,.08);padding:10px;display:flex;gap:8px;}
+.miniui .bar{width:26%;border-radius:7px;background:#F3F6FC;border:1px solid #EDF1F8;display:flex;flex-direction:column;gap:6px;padding:7px 6px;}
+.miniui .bar span{height:6px;border-radius:3px;background:#E5EAF4;}
+.miniui .bar span.a{background:var(--brand-light);width:80%;}
+.miniui .bubbles{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center;}
+.miniui .bubbles i{display:block;height:9px;border-radius:5px;background:#EDF1F9;}
+.miniui .bubbles i.r{background:var(--brand-light);margin-left:34%;border:1px solid #DFE8FF;}
+.miniui .bubbles i.l{width:70%;}
+.miniui .stat{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.miniui .stat b{border-radius:8px;background:#F6F8FD;border:1px solid #EDF1F8;display:flex;flex-direction:column;justify-content:center;padding:8px;font-size:9px;color:var(--muted);}
+.miniui .stat b em{font-style:normal;font-size:16px;font-weight:750;color:var(--ink);}
+.miniui .stat b em.c{color:var(--brand-deep);}
+.miniui .phoneui{width:96px;height:104px;border-radius:16px;border:2.5px solid #1B2434;background:linear-gradient(180deg,#2454FF 0%,#4d74ff 34%,#F6F7F9 34%);box-shadow:0 8px 22px rgba(29,33,41,.12);padding:8px 6px 6px;display:flex;flex-direction:column;gap:5px;}
+.miniui .phoneui .t{color:#fff;font-size:7px;opacity:.9;font-weight:600;}
+.miniui .phoneui i{display:block;height:11px;border-radius:4px;background:#fff;box-shadow:0 1px 3px rgba(29,33,41,.07);}
+.miniui .phoneui i.w{width:82%;} .miniui .phoneui i.w2{width:60%;} .miniui .phoneui i.w3{width:70%;}
+.pcard .bd{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1;}
+.pcard .bd .tt{display:flex;align-items:center;gap:9px;font-size:16.5px;font-weight:700;}
+.pcard .bd .tt .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:17px;}
+.ic-u{background:var(--brand-light);color:var(--brand-deep);}
+.ic-a{background:#E9EEFB;color:#3D6BFF;}
+.ic-e{background:#E6FFFA;color:#0c8b7a;}
+.pcard .bd .ds{color:var(--muted);font-size:12.5px;margin:9px 0 13px;flex:1;}
+.pages-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px;}
+.pages-list span{font-size:11.5px;background:var(--bg-soft);border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:#5d6470;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:600;border-radius:10px;padding:11px 18px;transition:all .2s;cursor:pointer;border:1px solid transparent;font-size:13.5px;font-family:inherit;text-decoration:none;}
+.btn-primary{background:var(--brand-deep);color:#fff;}
+.btn-primary:hover{background:#1a40e0;}
+.btn-full{width:100%;}
+/* 机制说明 */
+.mech{background:#fff;border-radius:16px;box-shadow:0 1px 2px rgba(29,33,41,.05),0 10px 30px rgba(29,33,41,.08);padding:24px 26px;margin-bottom:26px;}
+.mech h2{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.mech h2 i{color:var(--brand);}
+.mech .sub{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.mitem{background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:14px 15px;transition:all .2s;}
+.mitem:hover{border-color:var(--brand-accent);background:var(--brand-light);}
+.mitem .mi{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:17px;color:var(--brand-deep);margin-bottom:9px;}
+.mitem b{font-size:13.5px;display:block;margin-bottom:4px;}
+.mitem span{font-size:12px;color:var(--muted);line-height:1.6;display:block;}
+/* 底部 */
+.foot{display:flex;gap:14px;align-items:center;color:var(--muted);font-size:12.5px;flex-wrap:wrap;}
+.foot a{color:var(--brand-deep);text-decoration:none;font-weight:600;}
+.foot a:hover{text-decoration:underline;}
+.flywheel{background:linear-gradient(135deg,#F0F4FF,#F7FAFF);border:1px solid #D9E2FF;border-radius:14px;padding:14px 18px;font-size:13px;color:var(--ink);margin-bottom:26px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.flywheel b{color:var(--brand-deep);}
+.flywheel .step{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #D9E2FF;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500;}
+.flywheel .arr{color:var(--brand-accent);}
+</style>
+<script src="gate.js"></script></head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-logo"><i class="ph-fill ph-headset"></i></div>
+    <div>
+      <h1>智能售后工单助手 · 三端原型</h1>
+      <div class="sub">AI 优先的轻量售后工具 —— 连锁网点软硬件维护 × 品牌上门服务调度</div>
+    </div>
+    <div class="ver">
+      <span class="tag tag-blue">v0.1 高保真可点</span>
+      <span class="tag tag-gray">示例租户：云味轩餐饮连锁（连锁型）</span>
+      <span class="tag tag-green">设计语言：智谱清言风格</span>
+    </div>
+  </div>
+
+  <p class="lead">入口是 <b>AI 对话</b>，知识库是资产，工单是兜底，agent 是降本手段。对话先拦截重复问题（参考企业知识库 + 历史工单），拦不住由 <b>AI 预填表单</b>一键转工单，调度分派（P0 人工 / P1 agent），工程师小程序上门服务，结单内容经<b>质量门</b>沉淀回知识库。</p>
+
+  <div class="flywheel">
+    <i class="ph-fill ph-arrows-clockwise" style="font-size:20px;color:var(--brand-deep)"></i>
+    <b>产品飞轮：</b>
+    <span class="step">用户提问</span><span class="arr">→</span>
+    <span class="step">AI 拦截</span><span class="arr">→</span>
+    <span class="step">AI 填单转工单</span><span class="arr">→</span>
+    <span class="step">调度</span><span class="arr">→</span>
+    <span class="step">工程师解决</span><span class="arr">→</span>
+    <span class="step">知识沉淀</span><span class="arr">→</span>
+    <span class="step" style="border-color:var(--brand);color:var(--brand-deep)">拦截率↑ 工单↓</span>
+  </div>
+
+  <div class="cards">
+    <div class="pcard">
+      <div class="visor v-user">
+        <div class="miniui">
+          <div class="bar"><span class="a"></span><span></span><span></span><span></span></div>
+          <div class="bubbles"><i class="l"></i><i class="r"></i><i class="l"></i><i class="r"></i></div>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tt"><span class="ic ic-u"><i class="ph ph-chats-circle"></i></span>用户端 · 售后豆包</div>
+        <div class="ds">豆包式会话界面：左栏会话清单，AI 引用知识库作答并附来源；AI 填单确认卡片一键转工单；逃生门常驻，随时转人工。</div>
+        <div class="pages-list"><span>会话问答</span><span>引用来源</span><span>AI 填单</span><span>工单跟踪</span><span>新建表单</span><span>逃生门</span></div>
+        <a class="btn btn-primary btn-full" href="user.html" target="_blank"><i class="ph ph-play"></i>打开用户端原型</a>
+      </div>
+    </div>
+
+    <div class="pcard">
+      <div class="visor v-admin">
+        <div class="miniui">
+          <div class="stat">
+            <b><em class="c">5</em>待分派</b><b><em>12</em>进行中</b>
+            <b><em class="c">47%</em>拦截率</b><b><em>18m</em>首响</b>
+          </div>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tt"><span class="ic ic-a"><i class="ph ph-gauge"></i></span>管理端 · 售后台</div>
+        <div class="ds">首屏是<b>AI 工作台</b>（对话式指挥中心）：Agent 调度消息与人机协同卡片在统一时间流中滚动，管理者随时对话问询数据与工作计划；右侧态势面板常驻。另有派单台、数据看板（拦截率即 ROI）与通知兜底队列。</div>
+        <div class="pages-list"><span>AI 工作台</span><span>Agent 协同卡</span><span>对话问询</span><span>派单台</span><span>工单管理</span><span>知识库</span><span>数据看板</span><span>运营概览</span></div>
+        <a class="btn btn-primary btn-full" href="admin.html" target="_blank"><i class="ph ph-play"></i>打开管理端原型</a>
+      </div>
+    </div>
+
+    <div class="pcard">
+      <div class="visor v-eng">
+        <div class="miniui">
+          <div class="phoneui"><span class="t">待接单 · 高</span><i class="w"></i><i class="w2"></i><i class="w3"></i></div>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tt"><span class="ic ic-e"><i class="ph ph-device-mobile"></i></span>工程师端 · 小程序</div>
+        <div class="ds">微信小程序：零注册接单、上门定位签到、AI 相似案例开单即带、结单摘要 AI 草稿；通知降级链送达留痕。飞书/钉钉生态端 P0 承接通知与轻操作。</div>
+        <div class="pages-list"><span>工单列表</span><span>接单</span><span>上门签到</span><span>处理记录</span><span>结单</span><span>消息留痕</span><span>我的</span></div>
+        <a class="btn btn-primary btn-full" href="engineer.html" target="_blank"><i class="ph ph-play"></i>打开工程师端原型</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mech">
+    <h2><i class="ph ph-shield-star"></i>五个关键机制（原型中均可体验）</h2>
+    <div class="sub">这些机制是本产品区别于传统「表单式」售后 SaaS 的核心，也是 PRD 验收标准的直观对照</div>
+    <div class="mgrid">
+      <div class="mitem"><div class="mi"><i class="ph ph-door-open"></i></div><b>逃生门</b><span>用户端每轮对话常驻「转人工 / 直接报修」，AI 拦截价值是预诊与预填，绝不硬聊。</span></div>
+      <div class="mitem"><div class="mi"><i class="ph ph-arrows-down-to-line"></i></div><b>AI 填单</b><span>会话上下文自动预填 6/8 项字段，用户确认即建单——产品的灵魂动作。</span></div>
+      <div class="mitem"><div class="mi"><i class="ph ph-bell-ringing"></i></div><b>通知降级链</b><span>订阅消息 → 服务号 → 短信 → 电话外呼，逐级递补，送达全程留痕，失败进人工兜底队列。</span></div>
+      <div class="mitem"><div class="mi"><i class="ph ph-funnel"></i></div><b>知识质量门</b><span>结单后 AI 评估沉淀价值：高置信自动入库（可回滚）、中置信转人审，防止知识库被污染。</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>配套文档：</span>
+    <a href="../docs/智能售后工单助手-PRD.md">《PRD v1.0》</a>
+    <a href="../docs/详细功能设计说明书.md">《详细功能设计》</a>
+    <a href="../docs/AI工作台-功能设计.md">《AI 工作台设计》</a>
+    <a href="../docs/工单模型与触发引擎设计.md">《工单模型与触发引擎》</a>
+    <span style="color:#C6CFDE">|</span>
+    <span>演示：</span>
+    <a href="slots.html" target="_blank">语义槽位配置 DEMO（工单无表单的核心机制）</a>
+    <span style="color:#C6CFDE">|</span>
+    <span>设计语言：品牌蓝 #2454FF · 思源黑体 · 清言式组件（与医疗智能体项目一致）· 2026-10-08</span>
+  </div>
+
+</div>
+</body>
+</html>

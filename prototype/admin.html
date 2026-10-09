@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>云味轩 · AI 售后台 — 管理端原型</title>
+<link rel="stylesheet" href="vendor/fonts/noto-sans-sc.css"/>
+<link rel="stylesheet" href="vendor/phosphor/regular.css"/>
+<link rel="stylesheet" href="vendor/phosphor/fill.css"/>
+<style>
+:root{
+  --brand:#2454FF;--brand-deep:#2454FF;--brand-light:#F0F4FF;--brand-accent:#7B9FFF;
+  --ink:#1D2129;--muted:#86909C;--line:#EEF0F5;--bg:#F6F7F9;--bg-soft:#F7F8FA;
+  --ok:#0fbf4f;--warn:#d49000;--danger:#f53f3f;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans SC Variable","Noto Sans SC","PingFang SC","HarmonyOS Sans SC","MiSans","Microsoft YaHei UI","Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.65;font-variant-numeric:tabular-nums;overflow:hidden;
+}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:#D6DBE4;border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--brand-accent);}
+::selection{background:rgba(36,84,255,.14);}
+#app{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ===== 顶栏 ===== */
+.topbar{height:54px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:12px;flex-shrink:0;box-shadow:0 1px 0 rgba(0,0,0,.02);}
+.logo{display:flex;align-items:center;gap:9px;}
+.logo-ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2454FF,#4d74ff);color:#fff;display:grid;place-items:center;font-size:16px;box-shadow:0 3px 8px rgba(36,84,255,.28);}
+.logo b{font-size:14.5px;font-weight:700;}
+.logo .env{font-size:10.5px;color:var(--brand-deep);background:var(--brand-light);border-radius:999px;padding:1px 8px;font-weight:600;}
+.top-search{flex:1;max-width:360px;display:flex;align-items:center;gap:7px;background:var(--bg-soft);border:1px solid transparent;border-radius:8px;padding:6px 12px;color:var(--muted);font-size:12.5px;margin-left:14px;cursor:text;}
+.top-search:hover{border-color:var(--brand-accent);background:#fff;}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+.top-btn{position:relative;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--muted);cursor:pointer;font-size:17px;transition:all .2s;}
+.top-btn:hover{background:var(--bg-soft);color:var(--brand-deep);}
+.top-btn .bdg{position:absolute;top:3px;right:3px;min-width:14px;height:14px;border-radius:7px;background:var(--danger);color:#fff;font-size:9px;display:grid;place-items:center;padding:0 3px;font-weight:700;}
+.top-user{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 8px;border-radius:9px;}
+.top-user:hover{background:var(--bg-soft);}
+.top-user .ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2454FF,#7B9FFF);color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:600;}
+.top-user .nm{font-size:13px;font-weight:600;}
+.top-user .rl{font-size:11px;color:var(--muted);}
+
+/* ===== 布局 ===== */
+.layout{flex:1;display:flex;min-height:0;}
+.aside{width:196px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:10px 10px 14px;overflow-y:auto;}
+.nav-label{font-size:10.5px;font-weight:700;color:#A9B0BC;letter-spacing:2px;padding:12px 10px 5px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:var(--ink);cursor:pointer;font-weight:500;font-size:13.5px;transition:all .18s;user-select:none;margin-bottom:2px;}
+.nav-item:hover{background:var(--bg-soft);color:var(--brand-deep);}
+.nav-item.active{background:var(--brand-light);color:var(--brand-deep);font-weight:600;}
+.nav-item i{font-size:17px;color:var(--muted);width:20px;text-align:center;}
+.nav-item:hover i,.nav-item.active i{color:var(--brand-deep);}
+.nav-item .cnt{margin-left:auto;background:#f2f3f5;color:var(--muted);font-size:10.5px;border-radius:999px;padding:0 7px;font-weight:600;}
+.nav-item.active .cnt{background:var(--brand);color:#fff;}
+.aside-foot{margin-top:auto;padding:10px;background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;font-size:11px;color:var(--muted);line-height:1.6;}
+.aside-foot b{color:var(--brand-deep);}
+
+.main{flex:1;min-width:0;overflow-y:auto;padding:20px 24px 28px;}
+.page{display:none;animation:fade .25s ease;}
+.page.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}
+}
+.page-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.page-head h2{font-size:19px;font-weight:700;}
+.page-head .desc{font-size:12.5px;color:var(--muted);}
+.page-head .sp{flex:1;}
+
+/* ===== 通用组件 ===== */
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(29,33,41,.05),0 6px 16px rgba(29,33,41,.08);}
+.card-pad{padding:18px 20px;}
+.card-title{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:650;margin-bottom:4px;}
+.card-title i{color:var(--brand);font-size:17px;}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 10px;border-radius:999px;font-size:12px;font-weight:500;line-height:1.7;white-space:nowrap;}
+.tag-blue{background:var(--brand-light);color:var(--brand-deep);}
+.tag-gray{background:#f2f3f5;color:var(--muted);}
+.tag-high{background:#fff0f0;color:#f53f3f;}
+.tag-medium{background:#fff7e6;color:#d49000;}
+.tag-low{background:#e8ffea;color:#0fbf4f;}
+.tag-teal{background:#e6fffa;color:#0c8b7a;}
+.btn{display:inline-flex;align-items:center;gap:6px;font-weight:500;border-radius:8px;padding:7px 15px;transition:all .2s;cursor:pointer;border:1px solid transparent;font-size:13px;line-height:1.2;white-space:nowrap;font-family:inherit;}
+.btn-primary{background:var(--brand-deep);color:#fff;}
+.btn-primary:not(:disabled):hover{background:#1a40e0;}
+.btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);}
+.btn-ghost:not(:disabled):hover{background:var(--bg-soft);border-color:var(--brand-accent);}
+.btn-soft{background:var(--brand-light);color:var(--brand-deep);}
+.btn-soft:not(:disabled):hover{background:#e0eaff;}
+.btn-danger{background:#fff;color:#f53f3f;border-color:#ffd4d4;}
+.btn-danger:not(:disabled):hover{background:#fff2f2;}
+.btn-sm{padding:4px 11px;font-size:12px;border-radius:6px;}
+.field{border:1px solid transparent;border-radius:8px;padding:7px 12px;background:var(--bg-soft);outline:none;font-size:13px;transition:all .2s;font-family:inherit;color:var(--ink);}
+.field:focus{background:#fff;border-color:var(--brand-deep);box-shadow:0 0 0 3px rgba(36,84,255,.12);}
+
+/* ===== 工作台 ===== */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;}
+.metric{padding:16px 18px;position:relative;overflow:hidden;}
+.metric .mk{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.metric .mv{font-size:30px;font-weight:700;letter-spacing:-.5px;margin:4px 0 2px;font-variant-numeric:tabular-nums;}
+.metric .md{font-size:11.5px;color:var(--muted);}
+.metric .up{color:var(--ok);font-weight:600;}
+.metric .warn-dot{display:inline-flex;align-items:center;gap:4px;color:var(--danger);font-weight:600;}
+.metric .ic-bg{position:absolute;right:-8px;bottom:-10px;font-size:74px;color:var(--brand-light);z-index:0;}
+.metric>*{position:relative;z-index:1;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.list-row{display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid var(--line);}
+.list-row:last-child{border-bottom:0;}
+.fail-item{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid #FFE3C2;background:#FFFBF4;border-radius:10px;margin-bottom:9px;}
+.fail-item:last-child{margin-bottom:0;}
+.fail-item .fi-ic{width:30px;height:30px;border-radius:8px;background:#fff7e6;color:var(--warn);display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+.mini-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.mini-table th{text-align:left;color:var(--muted);font-weight:500;padding:7px 8px;border-bottom:1px solid var(--line);font-size:11.5px;}
+.mini-table td{padding:8px;border-bottom:1px solid var(--line);}
+.mini-table tr:last-child td{border-bottom:0;}
+
+/* ===== 派单台 ===== */
+.dispatch-grid{display:grid;grid-template-columns:minmax(380px,1.2fr) minmax(320px,1fr);gap:16px;align-items:start;}
+.dpool{display:flex;flex-direction:column;gap:11px;}
+.dcard{padding:15px 17px;cursor:default;transition:all .2s;border:1px solid transparent;}
+.dcard:hover{border-color:var(--brand-accent);}
+.dcard-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap;}
+.dcard-top .no{font-weight:700;font-size:13px;}
+.dcard-title{font-size:14.5px;font-weight:600;margin-bottom:5px;}
+.dcard-desc{font-size:12.5px;color:var(--muted);margin-bottom:9px;}
+.dcard-meta{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap;margin-bottom:11px;}
+.ai-rec{display:flex;align-items:center;gap:8px;background:var(--brand-light);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--brand-deep);margin-bottom:11px;}
+.ai-rec i{font-size:15px;}
+.ai-rec b{font-weight:650;}
+.eng-card{padding:13px 15px;margin-bottom:10px;border:1px solid transparent;transition:all .2s;}
+.eng-card:hover{border-color:var(--brand-accent);}
+.eng-head{display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+.eng-ava{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:14px;flex-shrink:0;}
+.eng-head .nm{font-weight:650;font-size:13.5px;}
+.eng-head .org{font-size:11px;color:var(--muted);}
+.st-dot{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;}
+.st-dot::before{content:"";width:7px;height:7px;border-radius:50%;}
+.st-free{color:var(--ok);}.st-free::before{background:var(--ok);}
+.st-busy{color:var(--warn);}.st-busy::before{background:var(--warn);}
+.st-off{color:var(--muted);}.st-off::before{background:#C6CFDE;}
+.load-bar{display:flex;gap:3px;margin:7px 0;}
+.load-bar span{height:6px;flex:1;border-radius:3px;background:#EDF0F5;}
+.load-bar span.on{background:var(--brand);}
+.load-bar span.cap{background:var(--brand-light);}
+
+/* ===== 表格 ===== */
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;padding:11px 12px;border-bottom:1px solid var(--line);background:var(--bg-soft);white-space:nowrap;}
+.tbl th:first-child{border-radius:8px 0 0 8px;}
+.tbl th:last-child{border-radius:0 8px 8px 0;}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:0;}
+.tbl tbody tr{cursor:pointer;transition:background .15s;}
+.tbl tbody tr:hover{background:var(--brand-light);}
+.src-pill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;background:var(--brand-light);color:var(--brand-deep);border-radius:999px;padding:1px 9px;}
+.src-pill.manual{background:#f2f3f5;color:var(--muted);}
+
+/* ===== 抽屉 ===== */
+.drawer-mask{position:fixed;inset:0;background:rgba(29,33,41,.32);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:440px;background:#fff;z-index:41;transform:translateX(105%);transition:transform .28s ease;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(29,33,41,.12);}
+.drawer.open{transform:none;}
+.drawer-mask.open{opacity:1;pointer-events:auto;}
+.dr-head{display:flex;align-items:center;gap:9px;padding:15px 18px;border-bottom:1px solid var(--line);}
+.dr-head b{font-size:15px;flex:1;}
+.dr-body{flex:1;overflow-y:auto;padding:18px;}
+.dr-sec{margin-bottom:20px;}
+.dr-sec h4{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:9px;}
+.kv{display:flex;gap:10px;font-size:13px;padding:6px 0;}
+.kv .k{width:76px;color:var(--muted);flex-shrink:0;}
+.kv .v{flex:1;font-weight:500;}
+.timeline{border-left:2px solid #E8EDF5;margin-left:6px;padding-left:16px;display:flex;flex-direction:column;gap:13px;}
+.tl-item{position:relative;font-size:12.5px;}
+.tl-item::before{content:"";position:absolute;left:-21.5px;top:4px;width:9px;height:9px;border-radius:50%;background:#fff;border:2.5px solid #C6CFDE;}
+.tl-item.done::before{background:var(--brand);border-color:var(--brand);}
+.tl-item .t{color:var(--muted);font-size:11px;}
+.tl-item b{font-weight:600;display:block;}
+/* 工单协同区（内外部消息协同） */
+.coop-msg{display:flex;gap:9px;margin-bottom:11px;}
+.coop-ava{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:600;flex-shrink:0;}
+.coop-bubble{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px 11px 11px 11px;padding:8px 12px;font-size:12.5px;flex:1;line-height:1.6;}
+.coop-name{font-size:11px;color:var(--muted);font-weight:600;display:flex;gap:6px;align-items:center;margin-bottom:2px;}
+.coop-time{font-weight:400;font-size:10px;}
+.coop-sys{font-size:11px;color:var(--muted);text-align:center;margin:8px 0;}
+.coop-input{display:flex;gap:8px;margin-top:10px;}
+.coop-input input{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;outline:none;background:var(--bg-soft);font-family:inherit;color:var(--ink);}
+.coop-input input:focus{background:#fff;border-color:var(--brand);}
+.coop-note{font-size:10.5px;color:var(--muted);margin-top:7px;display:flex;gap:5px;align-items:center;}
+
+/* ===== 看板 ===== */
+.bars{display:flex;align-items:flex-end;gap:7px;height:150px;padding-top:10px;}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end;}
+.bar .b{width:100%;max-width:26px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,var(--brand-accent),var(--brand));position:relative;transition:filter .2s;}
+.bar:hover .b{filter:brightness(1.12);}
+.bar .v{font-size:9.5px;color:var(--muted);}
+.bar .d{font-size:9.5px;color:var(--muted);}
+.rank-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line);}
+.rank-row:last-child{border-bottom:0;}
+.rank-no{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700;background:#f2f3f5;color:var(--muted);}
+.rank-no.r1{background:#FFF4D6;color:#d49000;}
+.rank-no.r2{background:#EDF0F5;color:#5d6470;}
+.rank-no.r3{background:#F7E8D8;color:#b0703a;}
+
+/* ===== 知识库 ===== */
+.kb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.doc-row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer;}
+.doc-row:hover .doc-t{color:var(--brand-deep);}
+.doc-ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+.doc-t{font-size:13.5px;font-weight:600;}
+.doc-m{font-size:11.5px;color:var(--muted);}
+.draft-review{border:1px solid #D9E2FF;border-radius:11px;padding:13px 15px;margin-bottom:10px;background:linear-gradient(180deg,#FAFBFF,#fff);}
+
+/* ===== 弹层 & toast ===== */
+.modal-mask{position:fixed;inset:0;background:rgba(29,33,41,.35);z-index:50;display:none;align-items:center;justify-content:center;}
+.modal-mask.open{display:flex;}
+.modal{width:420px;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(29,33,41,.25);overflow:hidden;animation:fade .2s ease;}
+.modal-head{padding:16px 20px 0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.modal-head i{color:var(--brand);}
+.modal-body{padding:14px 20px 4px;font-size:13px;color:var(--ink);}
+.modal-body .sel-box{background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:9px;font-size:12.5px;}
+.modal-body .sel-box b{font-size:13px;}
+.modal-foot{display:flex;justify-content:flex-end;gap:9px;padding:14px 20px 18px;}
+.toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-80px);background:var(--ink);color:#fff;font-size:13px;border-radius:10px;padding:9px 18px;display:flex;gap:8px;align-items:center;box-shadow:0 8px 28px rgba(29,33,41,.3);z-index:60;transition:transform .3s ease;white-space:nowrap;}
+.toast.show{transform:translate(-50%,0);}
+.toast i{color:#5BE49B;}
+.switch{width:34px;height:20px;border-radius:10px;background:#D5DAE3;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.switch.on{background:var(--brand);}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.switch.on::after{left:16px;}
+.set-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);}
+.set-row:last-child{border-bottom:0;}
+.set-row .st{flex:1;}
+.set-row .st b{font-size:13.5px;display:block;}
+.set-row .st span{font-size:12px;color:var(--muted);}
+.range{width:170px;accent-color:var(--brand);}
+
+/* ===== AI 工作台（对话式指挥中心） ===== */
+#p-copilot{padding:0;}
+.cp-wrap{display:flex;height:calc(100vh - 102px);min-height:560px;border-radius:16px;border:1px solid #E4E9F3;background:#fff;box-shadow:0 1px 2px rgba(29,33,41,.05),0 18px 44px -14px rgba(29,33,41,.18);overflow:hidden;}
+/* 左栏 */
+.cp-side{width:212px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+.cp-new{display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:9px;background:#fff;border:1px solid var(--brand);color:var(--brand);font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;font-family:inherit;margin-bottom:8px;}
+.cp-new:hover{background:var(--brand-light);}
+.cp-side-label{font-size:10.5px;font-weight:700;color:#A9B0BC;letter-spacing:2px;padding:10px 10px 5px;display:flex;align-items:center;gap:6px;}
+.cp-mini-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:500;letter-spacing:0;color:var(--brand-deep);background:var(--brand-light);border-radius:999px;padding:1px 9px;cursor:pointer;transition:all .2s;}
+.cp-mini-toggle:hover{background:#e0eaff;}
+.grp-toggle{background:none;padding:0 2px;}
+.grp-toggle:hover{background:var(--brand-light);}
+/* 人工服务台空态：单行轻提示 */
+.cp-empty{display:flex;align-items:center;gap:5px;font-size:10.5px;color:#7FA893;padding:4px 10px 8px;}
+.cp-empty i{font-size:12px;color:#0a9f40;flex-shrink:0;}
+.cp-empty em{font-style:normal;margin-left:auto;font-size:10px;color:#B3BAC6;}
+.cp-conv,.cp-agent{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:background .15s;font-size:12.5px;}
+.cp-conv:hover,.cp-agent:hover{background:var(--bg-soft);}
+.cp-conv.active,.cp-agent.active{background:var(--brand-light);}
+.cp-conv i,.cp-agent>b i{color:var(--brand);font-size:15px;}
+.cp-conv div,.cp-agent div{min-width:0;flex:1;}
+.cp-conv b,.cp-agent b{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;}
+.cp-conv span,.cp-agent span{font-size:10.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cp-agent.off{opacity:.5;}
+.cp-agent>b i{font-size:12px;color:var(--warn);}
+.cp-dot{width:8px;height:8px;border-radius:50%;background:#C6CFDE;flex-shrink:0;}
+.cp-dot.on{background:var(--ok);box-shadow:0 0 0 3px rgba(15,191,79,.15);}
+.cp-dot.warn{background:var(--warn);box-shadow:0 0 0 3px rgba(212,144,0,.15);}
+/* 中栏 */
+.cp-main{flex:1;min-width:0;display:flex;flex-direction:column;background:linear-gradient(180deg,#EBEFF8 0%,#F4F6FB 100%);}
+.cp-head{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#fff;border-bottom:1px solid var(--line);flex-shrink:0;}
+.cp-tabs{margin-left:auto;display:flex;gap:6px;}
+.cp-tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 14px;font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;font-family:inherit;}
+.cp-tab:hover{color:var(--brand-deep);border-color:var(--brand-accent);}
+.cp-tab.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+.cp-tab b{font-weight:700;margin-left:2px;}
+.cp-stream{flex:1;overflow-y:auto;padding:22px 26px;min-height:0;scroll-behavior:smooth;}
+.cp-stream>*{max-width:720px;margin-left:auto;margin-right:auto;}
+.cp-sys{text-align:center;font-size:11.5px;color:var(--muted);margin:20px 0 14px;display:flex;align-items:center;gap:10px;}
+.cp-sys::before,.cp-sys::after{content:"";flex:1;height:1px;background:var(--line);}
+/* Agent 协同卡 */
+.cp-card{background:#fff;border-radius:13px;border:1px solid #E4E9F3;box-shadow:0 2px 4px rgba(29,33,41,.04),0 10px 26px -8px rgba(29,33,41,.13);margin-bottom:14px;overflow:hidden;animation:fade .25s ease;}
+.cp-card.todo{border-left:3px solid var(--brand);}
+.cp-card[data-agent="sla"].todo{border-left-color:var(--danger);}
+.cp-card.done{opacity:.72;}
+.cp-card.resolved{opacity:.72;border-left:3px solid var(--ok)!important;}
+.cp-card-hd{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#FAFBFE,#fff);}
+.cp-card-hd b{font-size:13px;font-weight:650;}
+.cp-time{font-size:11px;color:var(--muted);margin-left:2px;}
+.cp-chip{font-size:10.5px;border-radius:999px;padding:1px 9px;font-weight:600;}
+.cp-chip.ok{background:#e8ffea;color:#0a9f40;}
+.cp-chip.warn{background:#fff7e6;color:#d49000;}
+.cp-chip.danger{background:#fff0f0;color:#f53f3f;}
+.cp-chip.gray{background:#f2f3f5;color:var(--muted);font-weight:500;}
+.cp-ava{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:14px;flex-shrink:0;}
+.cp-ava.kb{background:linear-gradient(135deg,#12B8A6,#0c8b7a);}
+.cp-ava.dp{background:linear-gradient(135deg,#5B8CFF,#2454FF);}
+.cp-ava.sla{background:linear-gradient(135deg,#FF7A59,#f53f3f);}
+.cp-ava.vs{background:linear-gradient(135deg,#FFB020,#d49000);}
+.cp-ava.ai{background:linear-gradient(135deg,#2454FF,#7B9FFF);width:26px;height:26px;font-size:13px;}
+.cp-card-bd{padding:12px 15px 4px;}
+.cp-line{font-size:13px;line-height:1.7;}
+.cp-line.sub{color:var(--muted);font-size:12.5px;}
+.cp-evidence{display:flex;gap:7px;align-items:flex-start;font-size:11.5px;color:var(--muted);background:var(--bg-soft);border-radius:8px;padding:7px 11px;margin:9px 0 4px;line-height:1.6;}
+.cp-evidence i{color:var(--brand);margin-top:2px;flex-shrink:0;}
+.cp-card-ft{display:flex;gap:8px;justify-content:flex-end;padding:10px 15px 13px;flex-wrap:wrap;}
+/* 人机对话 */
+.cp-msg{margin-bottom:20px;animation:fade .25s ease;}
+.cp-q{display:flex;justify-content:flex-end;gap:10px;margin-bottom:12px;}
+.cp-user-ava{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#2454FF,#7B9FFF);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600;flex-shrink:0;order:2;}
+.cp-q-bubble{background:var(--brand-light);border-radius:12px 12px 4px 12px;padding:9px 14px;font-size:13.5px;max-width:78%;}
+.cp-a{display:flex;flex-direction:column;gap:8px;}
+.cp-a-name{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted);}
+.cp-src{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;background:var(--brand-light);color:var(--brand-deep);border-radius:999px;padding:1px 9px;font-weight:500;}
+.cp-a-body{background:#fff;border:1px solid #E4E9F3;border-radius:13px;padding:14px 16px;box-shadow:0 2px 4px rgba(29,33,41,.04),0 10px 26px -8px rgba(29,33,41,.13);}
+.cp-a-body p{font-size:13.5px;margin:.35em 0;}
+.cp-a-body b{font-weight:650;}
+.cp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:10px 0;}
+.cp-kpis>div{background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:9px 11px;}
+.cp-kpis b{font-size:21px;font-weight:750;display:block;line-height:1.15;}
+.cp-kpis b em{font-style:normal;font-size:12px;font-weight:600;}
+.cp-kpis b.c{color:var(--brand-deep);}
+.cp-kpis b.warn{color:var(--warn);}
+.cp-kpis span{font-size:10.5px;color:var(--muted);display:block;margin-top:2px;line-height:1.5;}
+.cp-kpis i.up{color:var(--ok);font-style:normal;font-weight:600;}
+.cp-kpis i.warn{color:var(--warn);font-style:normal;font-weight:600;}
+.cp-plan{display:flex;flex-direction:column;gap:8px;margin:10px 0 4px;}
+.plan-row{display:flex;gap:10px;background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px;align-items:flex-start;}
+.plan-row .pn{width:20px;height:20px;border-radius:7px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.plan-row b{font-size:13px;display:block;}
+.plan-row span{font-size:11.5px;color:var(--muted);display:block;line-height:1.6;}
+.cp-refs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.ref{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all .2s;}
+.ref:hover{border-color:var(--brand-accent);box-shadow:0 3px 12px -4px rgba(36,84,255,.18);}
+.ref i{color:var(--brand);font-size:15px;}
+.ref .t{font-weight:500;white-space:nowrap;}
+.ref .s{color:var(--muted);font-size:10.5px;}
+.cp-follow{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:12px;color:var(--ink);cursor:pointer;transition:all .2s;font-family:inherit;}
+.chip:hover{border-color:var(--brand);color:var(--brand-deep);background:var(--brand-light);}
+/* 输入区 */
+.cp-composer-wrap{flex-shrink:0;padding:10px 24px 16px;background:linear-gradient(rgba(235,239,248,0),#F4F6FB 42%);}
+.cp-chips{max-width:720px;margin:0 auto 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.cp-hint{font-size:10.5px;color:var(--muted);display:inline-flex;gap:4px;align-items:center;margin-left:auto;}
+.cp-composer{max-width:720px;margin:0 auto;background:#fff;border:1.5px solid #E3E7EF;border-radius:14px;box-shadow:0 4px 18px rgba(29,33,41,.06);padding:9px 13px;transition:all .2s;}
+.cp-composer:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px rgba(36,84,255,.10);}
+.cp-composer textarea{width:100%;border:0;outline:0;resize:none;font-size:13.5px;line-height:1.6;background:transparent;font-family:inherit;min-height:22px;max-height:110px;}
+.cp-composer-bar{display:flex;align-items:center;gap:8px;margin-top:7px;}
+.cbtn{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:8px;font-size:12px;color:#5d6470;border:1px solid transparent;background:transparent;cursor:pointer;font-family:inherit;}
+.cbtn:hover{background:var(--bg-soft);color:var(--ink);}
+.cbtn.on{color:var(--brand-deep);background:var(--brand-light);}
+.cp-send{margin-left:auto;background:var(--brand);color:#fff;border-radius:8px;width:58px;height:32px;display:grid;place-items:center;font-size:15px;cursor:pointer;border:0;transition:all .2s;}
+.cp-send:hover{background:#1a40e0;}
+/* 右栏 */
+.cp-right{width:288px;flex-shrink:0;border-left:1px solid var(--line);background:#fff;overflow-y:auto;padding:14px 14px 20px;display:flex;flex-direction:column;gap:12px;}
+.rpanel{background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:13px 14px;}
+.rp-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:650;margin-bottom:10px;}
+.rp-title i{color:var(--brand);}
+.rp-time{margin-left:auto;font-size:10.5px;color:var(--muted);font-weight:400;}
+.rp-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:10.5px;border-radius:999px;padding:0 8px;font-weight:700;}
+.rp-badge.warn{background:var(--warn);}
+.rp-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rp-kpis>div{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;}
+.rp-kpis b{font-size:18px;font-weight:750;display:block;line-height:1.2;}
+.rp-kpis b.c{color:var(--brand-deep);}
+.rp-kpis b.warn{color:var(--warn);}
+.rp-kpis b i{font-style:normal;font-size:10.5px;font-weight:600;}
+.rp-kpis span{font-size:10.5px;color:var(--muted);display:block;line-height:1.4;margin-top:1px;}
+.rp-link{display:flex;align-items:center;gap:5px;margin-top:10px;font-size:12px;color:var(--brand-deep);font-weight:600;background:none;border:0;cursor:pointer;padding:0;font-family:inherit;}
+.rp-link:hover{text-decoration:underline;}
+.rp-list{display:flex;flex-direction:column;gap:2px;}
+.rp-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;font-size:12.5px;cursor:pointer;transition:background .15s;}
+.rp-item:hover{background:#fff;}
+.rp-item i{font-size:15px;}
+.rp-item b{margin-left:auto;font-size:12px;}
+.rp-agent{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 2px;}
+.rp-agent em{margin-left:auto;font-style:normal;color:var(--muted);font-size:10.5px;}
+/* 人工服务台（用户端转人工承接） */
+.cp-side-cnt{margin-left:auto;font-weight:400;color:var(--warn);font-size:10px;background:#fff7e6;border-radius:999px;padding:0 7px;}
+.cp-unread{width:8px;height:8px;border-radius:50%;background:var(--danger);flex-shrink:0;box-shadow:0 0 0 3px rgba(245,63,63,.15);}
+.cp-conv.queue{background:#FFFBF4;border:1px solid #FFE3C2;}
+.cp-human{flex:1;min-height:0;display:none;flex-direction:column;background:linear-gradient(180deg,#EBEFF8 0%,#F4F6FB 100%);}
+.cp-human.on{display:flex;}
+.hp-head{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#fff;border-bottom:1px solid var(--line);flex-shrink:0;}
+.hp-info{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+.hp-ava{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#FFB65C,#FF8A3D);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:600;flex-shrink:0;}
+.hp-info b{font-size:14px;display:block;}
+.hp-info>div>span{font-size:11.5px;color:var(--muted);}
+.hp-actions{display:flex;gap:8px;}
+.hp-stream{flex:1;overflow-y:auto;padding:8px 26px 14px;min-height:0;scroll-behavior:smooth;}
+.hp-stream>*{max-width:720px;margin-left:auto;margin-right:auto;}
+.ava-human{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#12B8A6,#0c8b7a);color:#fff;display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+.hp-bubble{background:#fff;border:1px solid #E4E9F3;box-shadow:0 2px 4px rgba(29,33,41,.04),0 10px 26px -8px rgba(29,33,41,.13);border-radius:4px 13px 13px 13px;padding:10px 14px;font-size:13.5px;}
+.hp-draft-flag{font-size:10.5px;color:#0c8b7a;background:#e6fffa;border-radius:999px;padding:1px 8px;font-weight:600;display:inline-flex;gap:3px;align-items:center;}
+.hp-back{border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:30px;display:grid;place-items:center;color:var(--muted);cursor:pointer;flex-shrink:0;}
+.hp-back:hover{color:var(--ink);background:var(--bg-soft);}
+/* 会话历史管理：左栏分组折叠 + 搜索 + 历史抽屉 */
+.cp-search{display:flex;align-items:center;gap:6px;background:var(--bg-soft);border:1px solid transparent;border-radius:8px;padding:6px 10px;color:var(--muted);font-size:12px;margin-bottom:8px;}
+.cp-search:hover,.cp-search:focus-within{border-color:var(--brand-accent);background:#fff;}
+.cp-search input{border:0;outline:0;background:none;flex:1;font-size:12px;color:var(--ink);font-family:inherit;min-width:0;}
+.cp-fold{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:5px;padding:6px 10px 2px;cursor:pointer;border-radius:7px;font-weight:500;}
+.cp-fold:hover{color:var(--brand-deep);background:var(--bg-soft);}
+.cp-fold i{font-size:11px;transition:transform .2s;}
+.cp-fold.open i{transform:rotate(90deg);}
+.cp-fold-grp{display:none;}
+.cp-fold-grp.open{display:block;}
+.cp-day-label{font-size:10px;color:#B3BAC6;font-weight:600;padding:7px 10px 3px;letter-spacing:1px;}
+.cp-history-btn{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:9px;border:1px dashed #C9D4E8;color:var(--muted);font-size:12px;cursor:pointer;background:none;font-family:inherit;transition:all .2s;}
+.cp-history-btn:hover{color:var(--brand-deep);border-color:var(--brand);background:var(--brand-light);}
+/* 中栏长会话折叠 */
+.cp-older{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--brand-deep);background:#fff;border:1px solid #E4E9F3;border-radius:999px;padding:6px 16px;cursor:pointer;margin:2px auto 14px;box-shadow:0 2px 8px rgba(29,33,41,.05);font-family:inherit;font-weight:500;}
+.cp-older:hover{border-color:var(--brand);background:var(--brand-light);}
+/* 历史抽屉 */
+.hdrawer{position:fixed;top:0;left:0;bottom:0;width:380px;background:#fff;z-index:41;transform:translateX(-105%);transition:transform .28s ease;display:flex;flex-direction:column;box-shadow:12px 0 40px rgba(29,33,41,.12);}
+.hdrawer.open{transform:none;}
+.hd-head{padding:16px 18px 10px;border-bottom:1px solid var(--line);}
+.hd-head b{font-size:15px;display:block;margin-bottom:10px;}
+.hd-tabs{display:flex;gap:6px;}
+.hd-tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 13px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;}
+.hd-tab.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+.hd-body{flex:1;overflow-y:auto;padding:8px 12px;}
+.hd-item{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px;cursor:pointer;}
+.hd-item:hover{background:var(--bg-soft);}
+.hd-ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+.hd-item b{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hd-item span{font-size:11px;color:var(--muted);}
+.hd-item .hd-t{margin-left:auto;text-align:right;flex-shrink:0;font-size:10.5px;color:var(--muted);}
+.hd-foot{padding:10px 16px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.6;}
+</style>
+<script src="gate.js"></script></head>
+<body>
+<div id="app">
+
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-ic"><i class="ph-fill ph-headset"></i></div>
+      <b>云味轩 · AI 售后台</b><span class="env">管理端 · 演示</span>
+    </div>
+    <div class="top-search"><i class="ph ph-magnifying-glass"></i>搜索工单号 / 网点 / 工程师…</div>
+    <div class="top-right">
+      <div class="top-btn" onclick="toast('通知中心（演示）')"><i class="ph ph-bell"></i><span class="bdg">3</span></div>
+      <div class="top-btn" onclick="toast('帮助中心（演示）')"><i class="ph ph-question"></i></div>
+      <div class="top-user">
+        <div class="ava">陈</div>
+        <div><div class="nm">陈璐</div><div class="rl">调度员 · 总部客服中心</div></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- 侧栏 -->
+    <aside class="aside">
+      <div class="nav-label">指挥中心</div>
+      <div class="nav-item active" data-p="copilot" onclick="go(this)"><i class="ph ph-chats-circle"></i>AI 工作台<span class="cnt" id="copilotCnt">3</span></div>
+      <div class="nav-item" data-p="dash" onclick="go(this)"><i class="ph ph-squares-four"></i>运营概览</div>
+      <div class="nav-item" data-p="dispatch" onclick="go(this)"><i class="ph ph-radar"></i>派单台<span class="cnt">5</span></div>
+      <div class="nav-label">工单</div>
+      <div class="nav-item" data-p="tickets" onclick="go(this)"><i class="ph ph-ticket"></i>工单管理</div>
+      <div class="nav-label">资源与台账</div>
+      <div class="nav-item" data-p="res" onclick="go(this)"><i class="ph ph-users-three"></i>资源池</div>
+      <div class="nav-item" data-p="sites" onclick="go(this)"><i class="ph ph-storefront"></i>网点与设备</div>
+      <div class="nav-label">知识与洞察</div>
+      <div class="nav-item" data-p="kb" onclick="go(this)"><i class="ph ph-database"></i>知识库<span class="cnt">3</span></div>
+      <div class="nav-item" data-p="stats" onclick="go(this)"><i class="ph ph-chart-line-up"></i>数据看板</div>
+      <div class="nav-label">系统</div>
+      <div class="nav-item" data-p="settings" onclick="go(this)"><i class="ph ph-gear-six"></i>系统设置</div>
+      <div class="aside-foot"><b>今日拦截率 47%</b><br/>AI 已在对话中解决 29 个问题，省下 29 张人工工单。</div>
+    </aside>
+
+    <!-- 主区 -->
+    <main class="main">
+
+      <!-- ============ AI 工作台（对话式指挥中心 · 主界面） ============ -->
+      <section class="page active" id="p-copilot">
+        <div class="cp-wrap">
+          <!-- 左栏：对话与 Agent 频道 -->
+          <aside class="cp-side">
+            <button class="cp-new" onclick="cpNew()"><i class="ph ph-plus"></i>新的问询</button>
+            <div class="cp-search"><i class="ph ph-magnifying-glass"></i><input placeholder="搜索会话 / 用户 / 网点"/></div>
+            <div class="cp-side-label" onclick="toggleGrp(this,'grpHuman')" style="cursor:pointer">人工服务台 <span class="cp-side-cnt" id="hpCnt">1 排队</span><span class="cp-mini-toggle grp-toggle"><i class="ph ph-caret-down"></i></span></div>
+            <div id="grpHuman">
+              <div class="cp-conv queue" id="hpQueueItem" onclick="cpHuman()"><i class="ph ph-headset" style="color:#d49000"></i><div><b>周晓梅 · 高新万达店</b><span>排队 <span id="hpQueueTime">2:14</span> · 转人工 · 着急</span></div><span class="cp-unread"></span></div>
+              <div class="cp-empty" id="hpEmpty" style="display:none"><i class="ph ph-shield-check"></i>暂无排队 · AI 接待中<em>今日接入 9</em></div>
+            </div>
+            <div class="cp-side-label" onclick="toggleGrp(this,'grpAgent')" style="cursor:pointer">Agent 频道 <span style="font-weight:400;color:#B3BAC6">人机协同</span><span class="cp-mini-toggle grp-toggle"><i class="ph ph-caret-down"></i></span></div>
+            <div id="grpAgent">
+              <div class="cp-agent hub" id="tkHub" onclick="cpTicketHub()"><span class="cp-dot on" style="background:var(--brand);box-shadow:0 0 0 3px rgba(36,84,255,.15)"></span><div><b>工单工作台</b><span>全部工单操作 · 待处理 3</span></div></div>
+              <div class="cp-agent" data-agent="dispatch" onclick="cpAgentView(this)"><span class="cp-dot on"></span><div><b>自动派单 <i class="ph ph-flask" title="P1 能力预览"></i></b><span>分派 / 改派 · 待确认 1</span></div><span class="cp-unread"></span></div>
+              <div class="cp-agent" data-agent="kb" onclick="cpAgentView(this)"><span class="cp-dot on"></span><div><b>知识沉淀</b><span>入库审核 · 待审 1</span></div><span class="cp-unread"></span></div>
+              <div class="cp-agent" data-agent="sla" onclick="cpAgentView(this)"><span class="cp-dot warn"></span><div><b>SLA 升级</b><span>催办 / 改派 · 预警 1</span></div><span class="cp-unread"></span></div>
+              <div class="cp-agent" data-agent="visit" onclick="cpAgentView(this)"><span class="cp-dot on"></span><div><b>满意度回访</b><span>回访工单 · 差评 1</span></div><span class="cp-unread"></span></div>
+              <div class="cp-agent off" onclick="toast('质检巡检 Agent 将随 Agent 市场（P2）上线')"><span class="cp-dot"></span><div><b>质检巡检</b><span>P2 · Agent 市场</span></div></div>
+              <div class="cp-agent off" onclick="toast('结算核对 Agent 将随 Agent 市场（P2）上线')"><span class="cp-dot"></span><div><b>结算核对</b><span>P2 · Agent 市场</span></div></div>
+            </div>
+            <div class="cp-side-label">AI 会话<span id="myHistFold" class="cp-mini-toggle" onclick="toggleMyHist(event)"><i class="ph ph-caret-down"></i>展开</span></div>
+            <div class="cp-conv active" onclick="cpBack();toast('演示：完整剧本在「今日运营问询」')"><i class="ph ph-chart-line-up"></i><div><b>今日运营问询</b><span>11:05 · 拦截率 · 工作计划</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-package"></i><div><b>配件调拨确认</b><span>11:02 · 打印头库存</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-receipt"></i><div><b>服务商对账咨询</b><span>昨天 · 极速 IT 驳回单</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-video-camera"></i><div><b>监控离线处理跟进</b><span>10-06 · 天府三街店</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-storefront"></i><div><b>新店开业筹备咨询</b><span>10-06 · 龙泉店设备清单</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-chart-scatter"></i><div><b>拦截率异常分析</b><span>10-05 · 国庆假期回落</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-file-export"></i><div><b>打印机更换记录导出</b><span>10-04 · 9 月汇总</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-monitor"></i><div><b>点餐屏供应商对接</b><span>10-03 · 换屏报价</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-users-three"></i><div><b>新服务商准入评估</b><span>10-03 · 极速 IT 增员</span></div></div>
+            <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-presentation-chart"></i><div><b>季度服务复盘问询</b><span>09-30 · Q3 数据</span></div></div>
+            <div class="cp-fold-grp" id="myHistGrp">
+              <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-calendar-blank"></i><div><b>国庆排班安排</b><span>09-28 · 调度轮值</span></div></div>
+              <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-package"></i><div><b>九月备件询价</b><span>09-26 · 打印头批次</span></div></div>
+              <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-chat-centered-text"></i><div><b>双楠店差评复盘</b><span>09-24 · 回访跟进</span></div></div>
+              <div class="cp-conv" onclick="toast('演示原型仅完整呈现今日会话')"><i class="ph ph-printer"></i><div><b>打印机批量更换评估</b><span>09-20 · 12 家门店</span></div></div>
+            </div>
+            <button class="cp-history-btn" onclick="openHistory()"><i class="ph ph-archive"></i>全部会话历史（含归档）</button>
+          </aside>
+
+          <!-- 中栏：统一消息流 -->
+          <div class="cp-main">
+            <!-- 人工会话视图（用户端「转人工」承接） -->
+            <div class="cp-human" id="cpHuman">
+              <div class="hp-head">
+                <button class="hp-back" onclick="cpBack()" title="返回指挥中心"><i class="ph ph-arrow-left"></i></button>
+                <div class="hp-info">
+                  <span class="hp-ava">周</span>
+                  <div><b>周晓梅 · 高新万达店</b><span>来自用户端「转人工」 · <i class="ph ph-timer"></i> <span id="hpState" style="color:var(--warn);font-weight:600">排队中 2:14</span></span></div>
+                </div>
+                <div class="hp-actions">
+                  <button class="btn btn-sm btn-primary" id="hpAcceptBtn" onclick="hpAccept()"><i class="ph ph-phone-call"></i>接入会话</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('已创建工单 GD20261008-0018 · AI 已按对话预填，待用户端确认')"><i class="ph ph-ticket"></i>创建工单</button>
+                  <button class="btn btn-sm btn-ghost" onclick="hpEnd()"><i class="ph ph-x-circle"></i>结束</button>
+                </div>
+              </div>
+              <div class="hp-stream" id="hpStream">
+                <!-- AI 上下文摘要（转接时自动附带） -->
+                <div class="cp-card">
+                  <div class="cp-card-hd"><span class="cp-ava ai"><i class="ph-fill ph-sparkle"></i></span><b>AI 上下文摘要 · 转接时自动附带</b><span class="cp-time">11:45</span></div>
+                  <div class="cp-card-bd">
+                    <div class="cp-line">用户在「小票打印机亮红灯不出单」会话中完成 2 步远程排查无效，AI 判定需上门更换打印头并已预填工单，<b>用户选择转人工确认</b>。情绪偏急（临近午高峰）。</div>
+                    <div class="cp-evidence"><i class="ph ph-lightbulb"></i>建议：直接创建高优先级工单（AI 已预填 6/8 项，推荐李成 12:40 前到店），或解答用户疑问后转回 AI</div>
+                  </div>
+                </div>
+                <div class="cp-sys">11:46 · 用户消息（排队中）</div>
+                <div class="cp-msg">
+                  <div class="cp-a">
+                    <div class="cp-a-name"><span class="ava-human"><i class="ph-fill ph-headset"></i></span>周晓梅 · 用户端</div>
+                    <div class="cp-q" style="justify-content:flex-start"><div class="hp-bubble" style="border-radius:13px 13px 4px 13px">别让我再跟机器人说了，到底什么时候能有人来修？12 点就是午高峰了</div></div>
+                  </div>
+                </div>
+                <!-- 接入后消息由 JS 注入 #hpLive -->
+                <div id="hpLive"></div>
+              </div>
+              <div class="cp-composer-wrap">
+                <div class="cp-chips">
+                  <span style="font-size:11px;color:#0c8b7a;font-weight:600;display:inline-flex;align-items:center;gap:4px"><i class="ph-fill ph-sparkle"></i>AI 建议回复：</span>
+                  <button class="chip" onclick="hpQuick(this)">已安排李成师傅 12:40 前到店更换打印头，工单马上发你确认</button>
+                  <button class="chip" onclick="hpQuick(this)">打印头在保修范围内，本次上门不收费，请留意接听工程师电话</button>
+                  <button class="chip" onclick="cpBack()" style="color:var(--muted)">结束并转回 AI</button>
+                </div>
+                <div class="cp-composer">
+                  <textarea id="hpInput" rows="1" placeholder="以人工身份回复周晓梅…（Enter 发送）"></textarea>
+                  <div class="cp-composer-bar">
+                    <button class="cbtn on"><i class="ph ph-database"></i>引用知识库</button>
+                    <button class="cbtn" onclick="toast('插入工单卡片（演示）')"><i class="ph ph-ticket"></i>插入工单卡</button>
+                    <button class="cp-send" onclick="hpSend()"><i class="ph-fill ph-paper-plane-right"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cp-head" id="cpHead">
+              <div>
+                <div style="font-size:15.5px;font-weight:700">今日运营问询</div>
+                <div style="font-size:11.5px;color:var(--muted)">Agent 汇报与你的问询在同一个流里 · 上下文全程共享</div>
+              </div>
+              <div class="cp-tabs">
+                <button class="cp-tab active" data-f="all" onclick="cpFilter('all')">全部</button>
+                <button class="cp-tab" data-f="todo" onclick="cpFilter('todo')">待我处理 <b id="cpTodoN">3</b></button>
+                <button class="cp-tab" data-f="agent" onclick="cpFilter('agent')">Agent 动态</button>
+                <button class="cp-tab" data-f="mine" onclick="cpFilter('mine')">AI 会话</button>
+              </div>
+            </div>
+
+            <div class="cp-stream" id="cpStream">
+              <button class="cp-older" onclick="toast('已加载更早的 12 条消息（演示）· 滚动向上自动加载')"><i class="ph ph-arrow-line-up"></i>查看更早的 12 条消息</button>
+              <div class="cp-card" style="border-left:3px solid var(--brand-accent)">
+                <div class="cp-card-hd"><span class="cp-ava ai"><i class="ph-fill ph-person-arms-spread"></i></span><b>更早内容 · AI 摘要</b><span class="cp-time">08:30 – 09:00</span></div>
+                <div class="cp-card-bd"><div class="cp-line">早间你处理了 3 件事项：<b>① 确认夜间自动巡检无异常</b>（Agent 02:00 完成 198 网点巡检）；② 批复极速 IT 增员申请；③ 与采购确认打印头备件到库。相关消息已折叠，点击上方按钮展开。</div></div>
+              </div>
+              <div class="cp-sys">今天 09:00 · Agent 早报</div>
+
+              <!-- Agent 协同卡：知识沉淀 -->
+              <div class="cp-card agent todo" data-agent="kb">
+                <div class="cp-card-hd"><span class="cp-ava kb"><i class="ph-fill ph-database"></i></span><b>知识沉淀 Agent</b><span class="cp-time">09:00</span><span class="cp-chip ok">已自动执行 4</span></div>
+                <div class="cp-card-bd">
+                  <div class="cp-line">昨日 9 张结单评估完成：<b>4 条高置信已自动入库</b>（留痕可回滚），1 条中置信《点餐屏触控失灵排查思路》待人审，4 条判定不沉淀。</div>
+                  <div class="cp-evidence"><i class="ph ph-file-text"></i>依据：结单摘要相似度 + 历史引用次数 · 置信 0.91 / 0.68</div>
+                </div>
+                <div class="cp-card-ft">
+                  <button class="btn btn-sm btn-ghost" onclick="toast('查看知识草稿全文（演示），也可在「知识库」页处理')">查看草稿</button>
+                  <button class="btn btn-sm btn-primary" onclick="cpResolve(this,'已通过，知识已入库')">通过入库</button>
+                  <button class="btn btn-sm btn-ghost" onclick="cpResolve(this,'已暂缓，结单后再审')">暂缓</button>
+                </div>
+              </div>
+
+              <!-- 人问 AI：今日概览 -->
+              <div class="cp-msg mine">
+                <div class="cp-q"><span class="cp-user-ava">陈</span><div class="cp-q-bubble">今天整体情况怎么样？</div></div>
+                <div class="cp-a">
+                  <div class="cp-a-name"><span class="cp-ava ai"><i class="ph-fill ph-sparkle"></i></span>小云 · 管理助手 <span class="cp-src"><i class="ph ph-database"></i>实时数据</span></div>
+                  <div class="cp-a-body">
+                    <p>截至今日 11:30 的全局态势：</p>
+                    <div class="cp-kpis">
+                      <div><b>47<em>%</em></b><span>拦截率 <i class="up">↑6pp</i></span></div>
+                      <div><b>34</b><span>新工单 · 62% 会话生成</span></div>
+                      <div><b class="warn">5</b><span>待分派 · <i class="warn">1 单将超时</i></span></div>
+                      <div><b>12</b><span>进行中 · 首响 18min 达标</span></div>
+                    </div>
+                    <p>需要你注意的一件事：<b>GD20261008-0007（锦华万达店）工程师 20 分钟未接单</b>，SLA Agent 已发预警（见下方卡片），建议电话确认或改派。</p>
+                  </div>
+                  <div class="cp-follow">
+                    <button class="chip" onclick="cpQuick(this)">待分派工单明细</button>
+                    <button class="chip" onclick="cpQuick(this)">超时风险分析</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Agent 协同卡：自动派单建议 -->
+              <div class="cp-card agent todo" data-agent="dispatch">
+                <div class="cp-card-hd"><span class="cp-ava dp"><i class="ph-fill ph-radar"></i></span><b>自动派单 Agent</b><span class="cp-time">09:47</span><span class="cp-chip warn">待确认</span><span class="cp-chip gray">P1 能力预览</span></div>
+                <div class="cp-card-bd">
+                  <div class="cp-line"><b>建议分派：GD20261008-0010 → 李成（蜀维科技）</b></div>
+                  <div class="cp-line sub">天府三街店 · 监控摄像头离线 · 期望 17:00 前</div>
+                  <div class="cp-evidence"><i class="ph ph-sparkle"></i>依据：距离 1.2km（最近）· 在办 1/4（负载最低）· 监控认证 · 该网点历史完成 6 次 · 综合置信 <b>0.87</b></div>
+                </div>
+                <div class="cp-card-ft">
+                  <button class="btn btn-sm btn-primary" onclick="cpResolve(this,'已批准：工单已分派李成，通知经降级链送达')"><i class="ph ph-check"></i>批准分派</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('打开派单台手动选择（演示）');go2('dispatch')">调整为其他人</button>
+                  <button class="btn btn-sm btn-ghost" onclick="cpResolve(this,'已驳回：该建议不再执行，Agent 将记录反馈')">驳回</button>
+                </div>
+              </div>
+
+              <!-- Agent 协同卡：SLA 预警 -->
+              <div class="cp-card agent todo" data-agent="sla">
+                <div class="cp-card-hd"><span class="cp-ava sla"><i class="ph-fill ph-warning-octagon"></i></span><b>SLA 升级 Agent</b><span class="cp-time">10:20</span><span class="cp-chip danger">预警</span></div>
+                <div class="cp-card-bd">
+                  <div class="cp-line"><b>GD20261008-0007 · 锦华万达店 · 收银机黑屏（紧急）</b></div>
+                  <div class="cp-line sub">分派后工程师 20 分钟未接单。通知链已走完：订阅消息未读 → 服务号额度用尽 → 短信已送达未确认。</div>
+                  <div class="cp-evidence"><i class="ph ph-bell-ringing"></i>按响应 SLA（30 分钟）还剩 10 分钟，超时将升级通知运营负责人</div>
+                </div>
+                <div class="cp-card-ft">
+                  <button class="btn btn-sm btn-primary" onclick="cpResolve(this,'已电话联系工程师，3 分钟内确认接单（演示）')"><i class="ph ph-phone"></i>电话联系</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('打开派单台改派（演示）');go2('dispatch')">改派他人</button>
+                  <button class="btn btn-sm btn-ghost" onclick="cpResolve(this,'已忽略，SLA 倒计时继续')">忽略</button>
+                </div>
+              </div>
+
+              <div class="cp-sys">10:32 · 你的问询</div>
+
+              <!-- 人问 AI：工程师表现 -->
+              <div class="cp-msg mine">
+                <div class="cp-q"><span class="cp-user-ava">陈</span><div class="cp-q-bubble">李成最近表现怎么样？下周续约蜀维科技要不要重点谈他？</div></div>
+                <div class="cp-a">
+                  <div class="cp-a-name"><span class="cp-ava ai"><i class="ph-fill ph-sparkle"></i></span>小云 · 管理助手 <span class="cp-src"><i class="ph ph-database"></i>知识库 + 运营数据</span></div>
+                  <div class="cp-a-body">
+                    <p><b>李成（蜀维科技）近 30 天：86 单 · 平均处理 1.6h · 驳回率 2.1% · 评分 4.9</b>，全部指标为其服务商内第一，驳回率低于公司均值（4.1%）。</p>
+                    <p>续约建议：把李成列为<b>核心保留资源</b>，可在对账单中追加「高频网点优先派单」条款；同时注意蜀维科技整体负载已到 78%，建议补充 1 名同区域认证工程师。</p>
+                    <div class="cp-refs">
+                      <div class="ref" onclick="toast('打开来源（演示）')"><i class="ph ph-trophy"></i><div><div class="t">服务商质量排名 · 近30天</div><div class="s">数据看板 · T+1</div></div></div>
+                      <div class="ref" onclick="toast('打开来源（演示）')"><i class="ph ph-ticket"></i><div><div class="t">李成 · 历史工单 86 条</div><div class="s">工单管理</div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 人问 AI：工作计划 -->
+              <div class="cp-msg mine">
+                <div class="cp-q"><span class="cp-user-ava">陈</span><div class="cp-q-bubble">帮我安排一下明天的工作重点</div></div>
+                <div class="cp-a">
+                  <div class="cp-a-name"><span class="cp-ava ai"><i class="ph-fill ph-sparkle"></i></span>小云 · 管理助手 <span class="cp-src"><i class="ph ph-database"></i>基于明日待办与风险</span></div>
+                  <div class="cp-a-body">
+                    <p>根据在途工单、SLA 风险和知识库待审，明天建议按优先级处理三件事：</p>
+                    <div class="cp-plan">
+                      <div class="plan-row"><span class="pn">1</span><div><b>上午 10:00 前跟踪锦华万达店收银机主板更换</b><span>紧急工单，李明杰今日已带回配件，明日复装；建议 10 点电话确认恢复营业。</span></div></div>
+                      <div class="plan-row"><span class="pn">2</span><div><b>复核极速 IT 近 5 张驳回工单</b><span>其驳回率 4.1% 高于均值，明日续约谈判前需要明确责任划分。</span></div></div>
+                      <div class="plan-row"><span class="pn">3</span><div><b>处理双楠店差评回访 + 3 条知识草稿审核</b><span>回访 Agent 已生成差评摘要；知识库待审草稿积压 1 条（今日已提醒）。</span></div></div>
+                    </div>
+                  </div>
+                  <div class="cp-follow">
+                    <button class="chip" onclick="cpQuick(this)">生成明日派单预排</button>
+                    <button class="chip" onclick="cpQuick(this)">发我日程提醒</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cp-sys">11:30 · Agent 动态</div>
+
+              <!-- Agent 协同卡：回访结果 -->
+              <div class="cp-card agent" data-agent="visit">
+                <div class="cp-card-hd"><span class="cp-ava vs"><i class="ph-fill ph-chat-centered-text"></i></span><b>满意度回访 Agent</b><span class="cp-time">11:30</span><span class="cp-chip ok">已完成 9</span></div>
+                <div class="cp-card-bd">
+                  <div class="cp-line">昨日 9 张结单回访完成：8 条满意（均分 4.8），<b>1 条差评</b>——双楠店·电子秤（维修后次日再次称重不准）。</div>
+                  <div class="cp-evidence"><i class="ph ph-quote"></i>差评原文："昨天修完今天又不准了，还耽误了称重出货。" · 建议：生成二次上门工单并升级优先级</div>
+                </div>
+                <div class="cp-card-ft">
+                  <button class="btn btn-sm btn-primary" onclick="cpResolve(this,'已生成回访工单 GD20261008-0016（高优先级·赵鹏）')">生成回访工单</button>
+                  <button class="btn btn-sm btn-ghost" onclick="cpResolve(this,'已标记处理，备注进工单时间线')">标记已沟通</button>
+                </div>
+              </div>
+
+              <!-- 已处理留痕示例 -->
+              <div class="cp-card agent done" data-agent="dispatch">
+                <div class="cp-card-hd"><span class="cp-ava dp"><i class="ph-fill ph-radar"></i></span><b>自动派单 Agent</b><span class="cp-time">11:38</span><span class="cp-chip ok">已执行</span></div>
+                <div class="cp-card-bd">
+                  <div class="cp-line"><b>GD20261008-0012 → 李成</b> 已由调度员 陈璐 批准，通知经「订阅消息」直达并确认。</div>
+                  <div class="cp-evidence"><i class="ph ph-check-circle"></i>全流程留痕 4 秒完成（传统人工派单平均 6 分钟）· Agent 将记录本次正反馈</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 输入区 -->
+            <div class="cp-composer-wrap" id="cpComposer">
+              <div class="cp-chips" id="cpChips">
+                <button class="chip" onclick="cpQuick(this)">今日概览</button>
+                <button class="chip" onclick="cpQuick(this)">待办事项</button>
+                <button class="chip" onclick="cpQuick(this)">服务商排名</button>
+                <button class="chip" onclick="cpQuick(this)">明日计划</button>
+                <span class="cp-hint"><i class="ph ph-lock-key"></i>回答基于本租户实时数据与知识库 · 联网检索自动脱敏</span>
+              </div>
+              <div class="cp-composer">
+                <textarea id="cpInput" rows="1" placeholder="问任何运营问题：工单、工程师、网点、知识库、工作计划…"></textarea>
+                <div class="cp-composer-bar">
+                  <button class="cbtn on"><i class="ph ph-database"></i>企业数据</button>
+                  <button class="cbtn on"><i class="ph ph-globe"></i>联网</button>
+                  <button class="cp-send" onclick="cpSend()"><i class="ph-fill ph-paper-plane-right"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右栏：上下文感知面板（随中栏模式切换） -->
+          <aside class="cp-right" id="cpRight">
+            <div id="rpCommand">
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-pulse"></i>今日态势 <span class="rp-time">11:30</span></div>
+                <div class="rp-kpis">
+                  <div><b class="c">47%</b><span>拦截率 ↑6pp</span></div>
+                  <div><b class="warn">5</b><span>待分派 ·1 超时风险</span></div>
+                  <div><b>12</b><span>进行中</span></div>
+                  <div><b>18<i>min</i></b><span>分派首响</span></div>
+                </div>
+                <button class="rp-link" onclick="go2('stats')">查看数据看板 <i class="ph ph-arrow-right"></i></button>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-handshake"></i>待我处理 <span class="rp-badge" id="rpTodo">3</span></div>
+                <div class="rp-list">
+                  <div class="rp-item" onclick="cpFilter('todo')"><i class="ph ph-radar" style="color:#3D6BFF"></i>自动派单建议待确认 <b>1</b></div>
+                  <div class="rp-item" onclick="cpFilter('todo')"><i class="ph ph-database" style="color:#0c8b7a"></i>知识草稿待人审 <b>1</b></div>
+                  <div class="rp-item" onclick="cpFilter('todo')"><i class="ph ph-warning-octagon" style="color:#f53f3f"></i>SLA 预警待处理 <b>1</b></div>
+                </div>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-bell-slash"></i>通知兜底 <span class="rp-badge warn">1</span></div>
+                <div class="rp-item" style="cursor:pointer" onclick="go2('dash')"><i class="ph ph-clock-user" style="color:#d49000"></i>GD-0007 短信送达未确认 · 建议电话</div>
+                <button class="rp-link" onclick="go2('dash')">进入运营概览兜底队列 <i class="ph ph-arrow-right"></i></button>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-robot"></i>Agent 运行态</div>
+                <div class="rp-agent"><span class="cp-dot on"></span>自动派单 <em>今日建议 3 · 采纳 2</em></div>
+                <div class="rp-agent"><span class="cp-dot on"></span>知识沉淀 <em>入库 4 · 待审 1</em></div>
+                <div class="rp-agent"><span class="cp-dot warn"></span>SLA 升级 <em>预警 1 · 剩 10min</em></div>
+                <div class="rp-agent"><span class="cp-dot on"></span>满意度回访 <em>回访 9 · 差评 1</em></div>
+                <button class="rp-link" onclick="toast('Agent 总览与配置：Agent 市场（P2）将提供接入与自建')">Agent 总览（P2 市场） <i class="ph ph-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- 人工会话态：服务对象资料 -->
+            <div id="rpHuman" style="display:none">
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-user-circle"></i>服务对象</div>
+                <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+                  <span class="hp-ava">周</span>
+                  <div><b style="font-size:14px">周晓梅</b><span style="display:block;font-size:11px;color:var(--muted)">高新万达店 · 店长 · 在册 2 年</span></div>
+                  <span class="tag tag-blue" style="margin-left:auto">VIP 网点</span>
+                </div>
+                <div class="kv" style="padding:3px 0"><div class="k">电话</div><div class="v">187****3321（脱敏）</div></div>
+                <div class="kv" style="padding:3px 0"><div class="k">地址</div><div class="v">天府三街 88 号</div></div>
+                <div class="kv" style="padding:3px 0"><div class="k">来源</div><div class="v">AI 会话转人工</div></div>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-ticket"></i>近 90 天工单 <span class="rp-time">3 张</span></div>
+                <div class="rp-item" style="cursor:pointer" onclick="openTicket()"><i class="ph ph-printer" style="color:#3D6BFF"></i>打印机故障（09-22 · 8 分钟解决）</div>
+                <div class="rp-item" style="cursor:pointer" onclick="openTicket()"><i class="ph ph-printer" style="color:#3D6BFF"></i>打印机卡纸（08-30）</div>
+                <div class="rp-item" style="cursor:pointer" onclick="openTicket()"><i class="ph ph-desktop" style="color:#3D6BFF"></i>收银机重启（07-15）</div>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-devices"></i>本单相关设备</div>
+                <div class="rp-item"><i class="ph ph-printer" style="color:#0c8b7a"></i>佳博 GP-C802V <em style="margin-left:auto;font-style:normal;font-size:10.5px;color:#0a9f40">在保</em></div>
+                <div style="font-size:11px;color:var(--muted);padding:2px 9px 0">资产 GB01198 · 网点共 12 台设备（在保 10）</div>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-sparkle"></i>AI 建议</div>
+                <div style="font-size:12px;color:var(--ink);line-height:1.7">工单已预填 <b>6/8 项</b>（高优先级），推荐 <b>李成 12:40 前上门</b>；该网点其历史完成 6 次。</div>
+                <button class="btn btn-sm btn-primary" style="margin-top:9px" onclick="toast('已创建工单 GD20261008-0018 · 待用户端确认')">一键创建工单</button>
+              </div>
+            </div>
+
+            <!-- Agent 频道态：运行详情 -->
+            <div id="rpAgent" style="display:none"></div>
+
+            <!-- 工单工作台态：待办汇总 -->
+            <div id="rpTicket" style="display:none">
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-list-checks"></i>工单待办汇总 <span class="rp-time">实时</span></div>
+                <div class="rp-kpis">
+                  <div><b class="warn">3</b><span>待分派</span></div>
+                  <div><b style="color:#f53f3f">1</b><span>超时预警</span></div>
+                  <div><b>2</b><span>待客户确认</span></div>
+                  <div><b style="color:#0a9f40">9</b><span>今日完成</span></div>
+                </div>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-hand-pointer"></i>待处理</div>
+                <div class="rp-item" onclick="go2('dispatch')"><i class="ph ph-video-camera" style="color:#3D6BFF"></i>GD-0010 监控离线 · 待分派 <b>17:00前</b></div>
+                <div class="rp-item" onclick="go2('dispatch')"><i class="ph ph-desktop" style="color:#f53f3f"></i>GD-0007 收银黑屏 · 超时预警 <b>剩10min</b></div>
+                <div class="rp-item" onclick="go2('tickets')"><i class="ph ph-printer" style="color:#3D6BFF"></i>GD-0008 电子秤 · 待客户确认</div>
+                <div class="rp-item" onclick="go2('tickets')"><i class="ph ph-monitor" style="color:#3D6BFF"></i>GD-0011 点餐屏 · 处理中（王强）</div>
+              </div>
+              <div class="rpanel">
+                <div class="rp-title"><i class="ph ph-sparkle"></i>对话式操作</div>
+                <div style="font-size:11.5px;color:var(--ink);line-height:1.7">在左侧输入框直接下指令，例如「<b>把 GD-0010 派给最近的工程师</b>」「催办一下锦华那单」，AI 会生成操作确认卡，确认后执行。</div>
+              </div>
+              <button class="cp-history-btn" style="margin-top:0" onclick="go2('dispatch')"><i class="ph ph-radar"></i>打开派单台完整视图</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 运营概览 ============ -->
+      <section class="page" id="p-dash">
+        <div class="page-head"><h2>运营概览</h2><span class="desc">2026-10-08 星期四 · 陈璐（调度员）</span><div class="sp"></div><button class="btn btn-primary" onclick="go2('dispatch')"><i class="ph ph-radar"></i>进入派单台</button></div>
+        <div class="metrics">
+          <div class="card metric"><i class="ph ph-hourglass ic-bg"></i><div class="mk"><i class="ph ph-hourglass"></i>待分派</div><div class="mv">5</div><div class="md"><span class="warn-dot"><i class="ph-fill ph-warning-circle"></i>1 单即将超时</span></div></div>
+          <div class="card metric"><i class="ph ph-wrench ic-bg"></i><div class="mk"><i class="ph ph-wrench"></i>进行中</div><div class="mv">12</div><div class="md">今日完成 9 · 驳回 1</div></div>
+          <div class="card metric"><i class="ph ph-sparkle ic-bg"></i><div class="mk"><i class="ph ph-sparkle"></i>今日 AI 拦截率</div><div class="mv">47<span style="font-size:16px">%</span></div><div class="md"><span class="up"><i class="ph ph-trend-up"></i>较上周 +6pp</span> · 拦截 29 会话</div></div>
+          <div class="card metric"><i class="ph ph-stopwatch ic-bg"></i><div class="mk"><i class="ph ph-stopwatch"></i>分派平均首响</div><div class="mv">18<span style="font-size:16px">min</span></div><div class="md">目标 &lt; 30 min · 达标</div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-warning-octagon"></i>通知失败 · 人工兜底队列</div>
+            <div class="card-sub">送达降级链走完后仍未确认的工单，需人工补位，确保不漏单</div>
+            <div class="fail-item">
+              <div class="fi-ic"><i class="ph ph-envelope-simple-open"></i></div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">GD20261008-0010 · 天府三街店</div>
+                <div style="font-size:12px;color:var(--muted)">订阅消息未送达 → 服务号额度用尽 → <b style="color:var(--warn)">短信已发出，工程师未确认</b></div>
+              </div>
+              <button class="btn btn-sm btn-ghost" onclick="toast('已重发通知（演示）')">重发</button>
+              <button class="btn btn-sm btn-primary" onclick="toast('呼叫 138****6721（演示）')"><i class="ph ph-phone"></i>电话</button>
+            </div>
+            <div class="fail-item">
+              <div class="fi-ic"><i class="ph ph-clock-user"></i></div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">GD20261008-0007 · 锦华万达店</div>
+                <div style="font-size:12px;color:var(--muted)">工程师 20 分钟未接单 → 降级短信已送达 → <b style="color:var(--warn)">建议改派</b></div>
+              </div>
+              <button class="btn btn-sm btn-ghost" onclick="toast('已重发通知（演示）')">重发</button>
+              <button class="btn btn-sm btn-soft" onclick="go2('dispatch')">改派</button>
+            </div>
+          </div>
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-list-checks"></i>今日概览</div>
+            <div class="card-sub">新工单 34 · 会话生成 21 · 手动/代建 13</div>
+            <table class="mini-table">
+              <tr><th>网点</th><th>类型</th><th>优先级</th><th>状态</th></tr>
+              <tr><td>高新万达店</td><td>打印机报修</td><td><span class="tag tag-high">紧急</span></td><td><span class="tag tag-low">已完成</span></td></tr>
+              <tr><td>锦华万达店</td><td>收银机黑屏</td><td><span class="tag tag-high">高</span></td><td><span class="tag tag-blue">处理中</span></td></tr>
+              <tr><td>春熙路店</td><td>点餐屏失灵</td><td><span class="tag tag-medium">中</span></td><td><span class="tag tag-blue">处理中</span></td></tr>
+              <tr><td>天府三街店</td><td>监控离线</td><td><span class="tag tag-low">低</span></td><td><span class="tag tag-teal">待分派</span></td></tr>
+              <tr><td>双楠店</td><td>电子秤不准</td><td><span class="tag tag-medium">中</span></td><td><span class="tag tag-low">已完成</span></td></tr>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 派单台 ============ -->
+      <section class="page" id="p-dispatch">
+        <div class="page-head"><h2>派单台</h2><span class="desc">待分派 5 单 · 按优先级排序 · AI 已给出分派建议</span><div class="sp"></div><button class="btn btn-ghost" onclick="toast('地图调度视图将在 P1 上线（演示）')"><i class="ph ph-map-trifold"></i>地图视图 P1</button></div>
+        <div class="dispatch-grid">
+          <div class="dpool" id="dpool">
+            <!-- 工单1 -->
+            <div class="card dcard" data-eng="李成" data-no="GD20261008-0010">
+              <div class="dcard-top"><span class="no">GD20261008-0010</span><span class="tag tag-high"><i class="ph-fill ph-arrow-fat-up" style="font-size:9px"></i>高</span><span class="src-pill"><i class="ph ph-sparkle"></i>会话生成</span><span class="tag tag-gray">报修 · 监控</span><span style="margin-left:auto;font-size:11.5px;color:var(--warn);font-weight:600"><i class="ph ph-warning-circle"></i> 25 分钟未分派</span></div>
+              <div class="dcard-title">天府三街店 · 监控摄像头离线</div>
+              <div class="dcard-desc">店员描述：门口球机离线，NVR 上红叉。AI 预判：POE 供电或线路问题，需现场排查。</div>
+              <div class="dcard-meta"><span><i class="ph ph-map-pin"></i> 距离最近工程师 1.2km</span><span><i class="ph ph-clock"></i> 期望今天 17:00 前</span><span><i class="ph ph-devices"></i> 海康 DS-2DC 球机 ×2</span></div>
+              <div class="ai-rec"><i class="ph-fill ph-sparkle"></i>AI 建议：分派给 <b>李成（蜀维科技）</b> — 监控认证工程师 · 今日在办 1 单 · 距离 1.2km · 该网点历史工单由其完成 6 次
+                <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openDispatch(this,'李成')">采纳分派</button></div>
+              <button class="btn btn-sm btn-ghost" onclick="openTicket()">查看详情</button>
+              <button class="btn btn-sm btn-ghost" onclick="openDispatch(this,null)">手动选择工程师</button>
+            </div>
+            <!-- 工单2 -->
+            <div class="card dcard" data-eng="王强" data-no="GD20261008-0014">
+              <div class="dcard-top"><span class="no">GD20261008-0014</span><span class="tag tag-medium">中</span><span class="src-pill manual"><i class="ph ph-phone"></i>代客建单</span><span class="tag tag-gray">报修 · 厨房设备</span></div>
+              <div class="dcard-title">春熙路店 · 制冷机异响</div>
+              <div class="dcard-desc">电话报修：制冰机运转异响，制冰量下降。期望明天上午。</div>
+              <div class="dcard-meta"><span><i class="ph ph-clock"></i> 期望明天 10:00 前</span><span><i class="ph ph-devices"></i> 万利多制冰机</span></div>
+              <div class="ai-rec"><i class="ph-fill ph-sparkle"></i>AI 建议：<b>王强（蜀维科技）</b> — 厨电技能 · 明日档期空闲 · 该品牌认证
+                <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openDispatch(this,'王强')">采纳分派</button></div>
+              <button class="btn btn-sm btn-ghost" onclick="openTicket()">查看详情</button>
+              <button class="btn btn-sm btn-ghost" onclick="openDispatch(this,null)">手动选择工程师</button>
+            </div>
+            <!-- 工单3 -->
+            <div class="card dcard" data-eng="李明杰" data-no="GD20261008-0015">
+              <div class="dcard-top"><span class="no">GD20261008-0015</span><span class="tag tag-low">低</span><span class="src-pill"><i class="ph ph-sparkle"></i>会话生成</span><span class="tag tag-gray">咨询转单</span></div>
+              <div class="dcard-title">双楠店 · 门头屏内容更新</div>
+              <div class="dcard-desc">店长会话中申请更换门头 LED 屏宣传内容，AI 判断需内部 IT 处理。</div>
+              <div class="dcard-meta"><span><i class="ph ph-clock"></i> 期望本周内</span></div>
+              <div class="ai-rec"><i class="ph-fill ph-sparkle"></i>AI 建议：<b>李明杰（内部 IT）</b> — 屏幕内容发布权限 · 本周 3 个空档
+                <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openDispatch(this,'李明杰')">采纳分派</button></div>
+              <button class="btn btn-sm btn-ghost" onclick="openTicket()">查看详情</button>
+            </div>
+          </div>
+          <div>
+            <div class="card card-pad">
+              <div class="card-title"><i class="ph ph-users-three"></i>服务资源池 · 负载</div>
+              <div class="card-sub">5 人在线 · 按匹配度与负载排序</div>
+              <div class="eng-card card" style="box-shadow:none;background:var(--bg-soft);margin-bottom:10px">
+                <div class="eng-head">
+                  <div class="eng-ava" style="background:linear-gradient(135deg,#12B8A6,#0c8b7a)">李</div>
+                  <div style="flex:1"><div class="nm">李成 <span class="st-dot st-free" style="margin-left:6px">空闲</span></div><div class="org">蜀维科技 · 高新区 · <i class="ph ph-seal-check" style="color:var(--brand)"></i>监控/打印认证</div></div>
+                  <div style="text-align:right"><div style="font-size:16px;font-weight:700">1<span style="font-size:11px;color:var(--muted);font-weight:400">/4</span></div><div style="font-size:10.5px;color:var(--muted)">在办/上限</div></div>
+                </div>
+                <div class="load-bar"><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag tag-blue">打印机</span><span class="tag tag-blue">收银机</span><span class="tag tag-blue">监控</span><span class="tag tag-gray">评分 4.9</span></div>
+              </div>
+              <div class="eng-card card" style="box-shadow:none;background:var(--bg-soft);margin-bottom:10px">
+                <div class="eng-head">
+                  <div class="eng-ava" style="background:linear-gradient(135deg,#5B8CFF,#3D6BFF)">李</div>
+                  <div style="flex:1"><div class="nm">李明杰 <span class="st-dot st-free" style="margin-left:6px">空闲</span></div><div class="org">内部 IT · 全域 · 收银系统/网络/内容发布</div></div>
+                  <div style="text-align:right"><div style="font-size:16px;font-weight:700">1<span style="font-size:11px;color:var(--muted);font-weight:400">/3</span></div><div style="font-size:10.5px;color:var(--muted)">在办/上限</div></div>
+                </div>
+                <div class="load-bar"><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag tag-blue">收银系统</span><span class="tag tag-blue">网络</span><span class="tag tag-gray">内部员工</span></div>
+              </div>
+              <div class="eng-card card" style="box-shadow:none;background:var(--bg-soft);margin-bottom:10px">
+                <div class="eng-head">
+                  <div class="eng-ava" style="background:linear-gradient(135deg,#FF9F5A,#F57D3D)">王</div>
+                  <div style="flex:1"><div class="nm">王强 <span class="st-dot st-busy" style="margin-left:6px">忙碌</span></div><div class="org">蜀维科技 · 锦江区 · 厨电/制冷认证</div></div>
+                  <div style="text-align:right"><div style="font-size:16px;font-weight:700">3<span style="font-size:11px;color:var(--muted);font-weight:400">/4</span></div><div style="font-size:10.5px;color:var(--muted)">在办/上限</div></div>
+                </div>
+                <div class="load-bar"><span class="on"></span><span class="on"></span><span class="on"></span><span class="cap"></span><span></span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag tag-blue">厨电</span><span class="tag tag-blue">制冷</span><span class="tag tag-gray">评分 4.7</span></div>
+              </div>
+              <div class="eng-card card" style="box-shadow:none;background:var(--bg-soft);margin-bottom:10px;opacity:.6">
+                <div class="eng-head">
+                  <div class="eng-ava" style="background:linear-gradient(135deg,#A8B3C5,#8A97AC)">赵</div>
+                  <div style="flex:1"><div class="nm">赵鹏 <span class="st-dot st-busy" style="margin-left:6px">忙碌</span></div><div class="org">极速 IT · 武侯区 · 收银/网络</div></div>
+                  <div style="text-align:right"><div style="font-size:16px;font-weight:700">2<span style="font-size:11px;color:var(--muted);font-weight:400">/3</span></div><div style="font-size:10.5px;color:var(--muted)">在办/上限</div></div>
+                </div>
+                <div class="load-bar"><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag tag-blue">收银</span><span class="tag tag-blue">网络</span><span class="tag tag-gray">评分 4.5</span></div>
+              </div>
+              <div class="eng-card card" style="box-shadow:none;background:var(--bg-soft);opacity:.55">
+                <div class="eng-head">
+                  <div class="eng-ava" style="background:#C6CFDE">孙</div>
+                  <div style="flex:1"><div class="nm">孙浩 <span class="st-dot st-off" style="margin-left:6px">离线</span></div><div class="org">极速 IT · 金牛区 · 安防</div></div>
+                  <div style="text-align:right"><div style="font-size:16px;font-weight:700">0<span style="font-size:11px;color:var(--muted);font-weight:400">/3</span></div><div style="font-size:10.5px;color:var(--muted)">在办/上限</div></div>
+                </div>
+                <div class="load-bar"><span></span><span></span><span></span><span></span><span></span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag tag-gray">今日未上线</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 工单管理 ============ -->
+      <section class="page" id="p-tickets">
+        <div class="page-head"><h2>工单管理</h2><div class="sp"></div><button class="btn btn-ghost"><i class="ph ph-download-simple"></i>导出 CSV</button><button class="btn btn-primary" onclick="toast('代客建单表单（演示）：AI 会对电话内容做语义预填')"><i class="ph ph-plus"></i>代客建单</button></div>
+        <div class="card card-pad">
+          <div class="filters">
+            <select class="field"><option>全部状态</option><option>待分派</option><option>待接单</option><option>处理中</option><option>待确认</option><option>已完成</option></select>
+            <select class="field"><option>全部优先级</option><option>紧急</option><option>高</option><option>中</option><option>低</option></select>
+            <select class="field"><option>全部来源</option><option>AI 会话生成</option><option>手动新建</option><option>调度员代建</option></select>
+            <select class="field"><option>全部网点</option><option>高新万达店</option><option>春熙路店</option><option>天府三街店</option><option>锦华万达店</option></select>
+            <input class="field" style="width:200px" placeholder="搜索工单号 / 设备 / 关键词"/>
+            <button class="btn btn-ghost btn-sm" onclick="toast('筛选（演示）')">查询</button>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>工单号</th><th>来源</th><th>类型</th><th>网点 / 设备</th><th>优先级</th><th>状态</th><th>工程师</th><th>创建</th><th></th></tr></thead>
+            <tbody>
+              <tr onclick="openTicket()"><td style="font-weight:700">GD…08-0012</td><td><span class="src-pill"><i class="ph ph-sparkle"></i>会话</span></td><td>报修·打印</td><td>高新万达店 · GP-C802V</td><td><span class="tag tag-high">高</span></td><td><span class="tag tag-blue">已接单</span></td><td>李成</td><td>11:26</td><td><i class="ph ph-caret-right" style="color:var(--muted)"></i></td></tr>
+              <tr onclick="openTicket()"><td style="font-weight:700">GD…08-0011</td><td><span class="src-pill"><i class="ph ph-sparkle"></i>会话</span></td><td>报修·屏幕</td><td>春熙路店 · 点餐屏 ×2</td><td><span class="tag tag-medium">中</span></td><td><span class="tag tag-blue">处理中</span></td><td>王强</td><td>10:02</td><td><i class="ph ph-caret-right" style="color:var(--muted)"></i></td></tr>
+              <tr onclick="openTicket()"><td style="font-weight:700">GD…08-0010</td><td><span class="src-pill"><i class="ph ph-sparkle"></i>会话</span></td><td>报修·监控</td><td>天府三街店 · 海康球机</td><td><span class="tag tag-low">低</span></td><td><span class="tag tag-teal">待分派</span></td><td>—</td><td>09:47</td><td><i class="ph ph-caret-right" style="color:var(--muted)"></i></td></tr>
+              <tr onclick="openTicket()"><td style="font-weight:700">GD…08-0009</td><td><span class="src-pill manual"><i class="ph ph-phone"></i>代建</span></td><td>报修·收银</td><td>锦华万达店 · 收银主机</td><td><span class="tag tag-high">紧急</span></td><td><span class="tag tag-blue">处理中</span></td><td>李明杰</td><td>09:15</td><td><i class="ph ph-caret-right" style="color:var(--muted)"></i></td></tr>
+              <tr onclick="openTicket()"><td style="font-weight:700">GD…08-0008</td><td><span class="src-pill"><i class="ph ph-sparkle"></i>会话</span></td><td>报修·称重</td><td>双楠店 · 电子秤</td><td><span class="tag tag-medium">中</span></td><td><span class="tag tag-low">已完成</span></td><td>赵鹏</td><td>昨天</td><td><i class="ph ph-caret-right" style="color:var(--muted)"></i></td></tr>
+              <tr onclick="openTicket()"><td style="font-weight:700">GD…07-0066</td><td><span class="src-pill manual"><i class="ph ph-pen"></i>手动</span></td><td>安装·门头屏</td><td>龙泉店 · LED 屏</td><td><span class="tag tag-low">低</span></td><td><span class="tag tag-low">已关闭</span></td><td>李明杰</td><td>10-05</td><td><i class="ph ph-caret-right" style="color:var(--muted)"></i></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 资源池 ============ -->
+      <section class="page" id="p-res">
+        <div class="page-head"><h2>资源池</h2><span class="desc">内部工程师与外部服务商统一管理 · 调度引擎只面向资源池</span><div class="sp"></div><button class="btn btn-primary"><i class="ph ph-plus"></i>添加工程师</button></div>
+        <div class="card card-pad">
+          <div class="card-title" style="margin-bottom:12px"><i class="ph ph-buildings"></i>服务商</div>
+          <table class="tbl" style="margin-bottom:22px">
+            <thead><tr><th>服务商</th><th>成员</th><th>覆盖区域</th><th>技能</th><th>本月完成</th><th>平均时长</th><th>驳回率</th><th>评分</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:650"><i class="ph-fill ph-building" style="color:var(--brand)"></i> 蜀维科技</td><td>12 人 · 5 在线</td><td>高新 / 锦江</td><td>打印/收银/监控/厨电</td><td>86</td><td>1.6h</td><td>2.3%</td><td><b style="color:var(--brand-deep)">4.8</b></td><td><button class="btn btn-sm btn-ghost">详情</button></td></tr>
+              <tr><td style="font-weight:650"><i class="ph-fill ph-building" style="color:var(--brand)"></i> 极速 IT</td><td>8 人 · 2 在线</td><td>武侯 / 金牛</td><td>收银/网络/安防</td><td>54</td><td>2.1h</td><td>4.1%</td><td><b style="color:var(--brand-deep)">4.5</b></td><td><button class="btn btn-sm btn-ghost">详情</button></td></tr>
+              <tr><td style="font-weight:650"><i class="ph-fill ph-building-office" style="color:#0c8b7a"></i> 内部 IT 组</td><td>3 人</td><td>全域</td><td>收银系统/网络/内容发布</td><td>37</td><td>1.2h</td><td>1.4%</td><td><b style="color:var(--brand-deep)">4.9</b></td><td><button class="btn btn-sm btn-ghost">详情</button></td></tr>
+            </tbody>
+          </table>
+          <div class="card-title" style="margin-bottom:12px"><i class="ph ph-users-three"></i>工程师（含服务商成员 · 仅可见分派给本服务商的工单）</div>
+          <table class="tbl">
+            <thead><tr><th>工程师</th><th>所属</th><th>状态</th><th>在办/上限</th><th>技能标签</th><th>服务区域</th><th>评分</th><th>认证</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">李成</td><td>蜀维科技</td><td><span class="st-dot st-free">空闲</span></td><td>1 / 4</td><td>打印机 · 收银机 · 监控</td><td>高新区</td><td>4.9</td><td><i class="ph-fill ph-seal-check" style="color:var(--brand)"></i> 2 项</td><td><button class="btn btn-sm btn-ghost">编辑</button></td></tr>
+              <tr><td style="font-weight:600">王强</td><td>蜀维科技</td><td><span class="st-dot st-busy">忙碌</span></td><td>3 / 4</td><td>厨电 · 制冷</td><td>锦江区</td><td>4.7</td><td><i class="ph-fill ph-seal-check" style="color:var(--brand)"></i> 1 项</td><td><button class="btn btn-sm btn-ghost">编辑</button></td></tr>
+              <tr><td style="font-weight:600">李明杰</td><td>内部 IT</td><td><span class="st-dot st-free">空闲</span></td><td>1 / 3</td><td>收银系统 · 网络</td><td>全域</td><td>—</td><td>内部员工</td><td><button class="btn btn-sm btn-ghost">编辑</button></td></tr>
+              <tr><td style="font-weight:600">赵鹏</td><td>极速 IT</td><td><span class="st-dot st-busy">忙碌</span></td><td>2 / 3</td><td>收银 · 网络</td><td>武侯区</td><td>4.5</td><td>—</td><td><button class="btn btn-sm btn-ghost">编辑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 网点与设备 ============ -->
+      <section class="page" id="p-sites">
+        <div class="page-head"><h2>网点与设备</h2><span class="desc">198 家门店 · 设备台账 1,842 台 · Excel 批量导入</span><div class="sp"></div><button class="btn btn-ghost"><i class="ph ph-upload-simple"></i>批量导入</button><button class="btn btn-primary"><i class="ph ph-plus"></i>新增网点</button></div>
+        <div class="card card-pad">
+          <div class="filters">
+            <select class="field"><option>全部区域</option><option>高新区</option><option>锦江区</option><option>武侯区</option><option>金牛区</option></select>
+            <input class="field" style="width:220px" placeholder="搜索网点名称 / 编号"/>
+            <button class="btn btn-ghost btn-sm">查询</button>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>网点</th><th>区域</th><th>设备数</th><th>在保</th><th>近 30 天工单</th><th>最新工单</th><th>负责人</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">高新万达店</td><td>高新区</td><td>12 台</td><td>10</td><td><b style="color:var(--warn)">7</b></td><td>打印机报修（今日）</td><td>周晓梅</td><td><button class="btn btn-sm btn-ghost">设备台账</button></td></tr>
+              <tr><td style="font-weight:600">春熙路店</td><td>锦江区</td><td>15 台</td><td>11</td><td>4</td><td>点餐屏（今日）</td><td>刘畅</td><td><button class="btn btn-sm btn-ghost">设备台账</button></td></tr>
+              <tr><td style="font-weight:600">天府三街店</td><td>高新区</td><td>10 台</td><td>8</td><td>3</td><td>监控（今日）</td><td>郑楠</td><td><button class="btn btn-sm btn-ghost">设备台账</button></td></tr>
+              <tr><td style="font-weight:600">锦华万达店</td><td>锦江区</td><td>13 台</td><td>9</td><td>5</td><td>收银主机（今日）</td><td>何静</td><td><button class="btn btn-sm btn-ghost">设备台账</button></td></tr>
+              <tr><td style="font-weight:600">双楠店</td><td>武侯区</td><td>9 台</td><td>7</td><td>2</td><td>电子秤（昨日）</td><td>杨帆</td><td><button class="btn btn-sm btn-ghost">设备台账</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 知识库 ============ -->
+      <section class="page" id="p-kb">
+        <div class="page-head"><h2>知识库</h2><span class="desc">自建 + 飞书同步 + 工单沉淀 · AI 回答的唯一依据来源</span><div class="sp"></div><button class="btn btn-ghost"><i class="ph ph-plugs-connected"></i>飞书同步任务</button><button class="btn btn-primary"><i class="ph ph-plus"></i>新建文档</button></div>
+        <div class="kb-stats">
+          <div class="card card-pad" style="text-align:center"><div style="font-size:26px;font-weight:700;color:var(--brand-deep)">139</div><div style="font-size:12px;color:var(--muted)">知识条目总数</div></div>
+          <div class="card card-pad" style="text-align:center"><div style="font-size:26px;font-weight:700">86</div><div style="font-size:12px;color:var(--muted)"><i class="ph ph-cloud-arrow-down"></i> 飞书同步（增量 2h 前）</div></div>
+          <div class="card card-pad" style="text-align:center"><div style="font-size:26px;font-weight:700;color:#0c8b7a">41</div><div style="font-size:12px;color:var(--muted)">工单沉淀（质量门入库）</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-file-text"></i>知识文档</div>
+            <div class="card-sub">点击预览 · 同步状态实时可见</div>
+            <div class="doc-row"><div class="doc-ic" style="background:var(--brand-light);color:var(--brand-deep)"><i class="ph ph-file-text"></i></div><div style="flex:1"><div class="doc-t">《收银设备故障处理手册》</div><div class="doc-m">自建 · 42 节 · 被引用 318 次 · 上周更新</div></div><span class="tag tag-blue">高频</span></div>
+            <div class="doc-row"><div class="doc-ic" style="background:#E6F4FF;color:#0a7cce"><i class="ph ph-cloud-arrow-down"></i></div><div style="flex:1"><div class="doc-t">《门店运营标准 SOP》</div><div class="doc-m">飞书同步 · 知识空间「云味轩运营」 · 2h 前增量</div></div><span class="tag tag-teal">同步中</span></div>
+            <div class="doc-row"><div class="doc-ic" style="background:#E6FFFA;color:#0c8b7a"><i class="ph ph-ticket"></i></div><div style="flex:1"><div class="doc-t">GP-C802V 红灯故障 · 处理方案</div><div class="doc-m">工单沉淀 · 来自 GD20260922-0031 · 已人审</div></div><span class="tag tag-low">已入库</span></div>
+            <div class="doc-row"><div class="doc-ic" style="background:#FFF4D6;color:#d49000"><i class="ph ph-map-pin-area"></i></div><div style="flex:1"><div class="doc-t">《新店开业设备自检清单 v3》</div><div class="doc-m">自建 · 被引用 96 次</div></div><span class="tag tag-gray">常规</span></div>
+          </div>
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-sparkle"></i>知识草稿 · 待人审（质量门）</div>
+            <div class="card-sub">结单后 AI 评估沉淀价值生成草稿；高置信自动入库项也在此留痕可回滚</div>
+            <div class="draft-review">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="tag tag-blue">高置信 · 已自动入库</span><span style="font-size:11px;color:var(--muted)">GD…08-0008 · 双楠店</span></div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px">电子秤称重漂移 → 传感器校准流程</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px">AI 摘要：症状为称重偏差 >5%，执行三点校准后恢复。附工程师实测记录。</div>
+              <button class="btn btn-sm btn-ghost" onclick="toast('查看草稿全文（演示）')">查看</button>
+              <button class="btn btn-sm btn-danger" onclick="revoke(this)">回滚不入库</button>
+            </div>
+            <div class="draft-review">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="tag tag-medium">中置信 · 待人审</span><span style="font-size:11px;color:var(--muted)">GD…08-0011 · 春熙路店</span></div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px">点餐屏触控失灵 · 排查思路待验证</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px">AI 摘要：疑似排线松动，工单仍在处理中，建议结单后再审。</div>
+              <button class="btn btn-sm btn-primary" onclick="approve(this)">通过入库</button>
+              <button class="btn btn-sm btn-ghost" onclick="reject(this)">暂缓</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 数据看板 ============ -->
+      <section class="page" id="p-stats">
+        <div class="page-head"><h2>数据看板</h2><span class="desc">T+1 汇总 · 拦截率是核心经营指标：拦截率越高，人工工单越少</span><div class="sp"></div><select class="field"><option>近 14 天</option><option>近 30 天</option><option>本季度</option></select></div>
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-chart-bar"></i>AI 拦截率趋势</div>
+            <div class="card-sub">对话解决且未生成工单的会话占比 · 目标 60%</div>
+            <div class="bars">
+              <div class="bar"><span class="v">31%</span><div class="b" style="height:31%"></div><span class="d">9/24</span></div>
+              <div class="bar"><span class="v">34%</span><div class="b" style="height:34%"></div><span class="d">9/25</span></div>
+              <div class="bar"><span class="v">33%</span><div class="b" style="height:33%"></div><span class="d">9/26</span></div>
+              <div class="bar"><span class="v">38%</span><div class="b" style="height:38%"></div><span class="d">9/27</span></div>
+              <div class="bar"><span class="v">41%</span><div class="b" style="height:41%"></div><span class="d">9/28</span></div>
+              <div class="bar"><span class="v">39%</span><div class="b" style="height:39%"></div><span class="d">9/29</span></div>
+              <div class="bar"><span class="v">36%</span><div class="b" style="height:36%"></div><span class="d">9/30</span></div>
+              <div class="bar"><span class="v">40%</span><div class="b" style="height:40%"></div><span class="d">10/1</span></div>
+              <div class="bar"><span class="v">43%</span><div class="b" style="height:43%"></div><span class="d">10/2</span></div>
+              <div class="bar"><span class="v">45%</span><div class="b" style="height:45%"></div><span class="d">10/3</span></div>
+              <div class="bar"><span class="v">44%</span><div class="b" style="height:44%"></div><span class="d">10/4</span></div>
+              <div class="bar"><span class="v">46%</span><div class="b" style="height:46%"></div><span class="d">10/5</span></div>
+              <div class="bar"><span class="v">47%</span><div class="b" style="height:47%"></div><span class="d">10/7</span></div>
+              <div class="bar"><span class="v" style="color:var(--brand-deep);font-weight:700">47%</span><div class="b" style="height:47%;box-shadow:0 0 0 2px rgba(36,84,255,.25)"></div><span class="d" style="color:var(--brand-deep)">今日</span></div>
+            </div>
+          </div>
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-trophy"></i>服务商质量排名</div>
+            <div class="card-sub">按完成量 · 驳回率 · 平均时长综合</div>
+            <div class="rank-row"><div class="rank-no r1">1</div><div style="flex:1"><b style="font-size:13px">内部 IT 组</b><div style="font-size:11.5px;color:var(--muted)">37 单 · 1.2h · 驳回 1.4%</div></div><b style="color:var(--brand-deep)">4.9</b></div>
+            <div class="rank-row"><div class="rank-no r2">2</div><div style="flex:1"><b style="font-size:13px">蜀维科技</b><div style="font-size:11.5px;color:var(--muted)">86 单 · 1.6h · 驳回 2.3%</div></div><b style="color:var(--brand-deep)">4.8</b></div>
+            <div class="rank-row"><div class="rank-no r3">3</div><div style="flex:1"><b style="font-size:13px">极速 IT</b><div style="font-size:11.5px;color:var(--muted)">54 单 · 2.1h · 驳回 4.1%</div></div><b style="color:var(--brand-deep)">4.5</b></div>
+            <div style="margin-top:12px;padding:10px 12px;background:var(--brand-light);border-radius:10px;font-size:12px;color:var(--brand-deep)"><i class="ph ph-lightbulb"></i> 极速 IT 驳回率高于均值，建议复核其最近 5 张驳回工单</div>
+          </div>
+        </div>
+        <div class="card card-pad">
+          <div class="card-title"><i class="ph ph-chart-pie-slice"></i>工单结构 · 近 14 天</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:10px">
+            <div style="text-align:center;padding:14px;background:var(--bg-soft);border-radius:10px"><div style="font-size:22px;font-weight:700">412</div><div style="font-size:12px;color:var(--muted)">工单总量</div></div>
+            <div style="text-align:center;padding:14px;background:var(--bg-soft);border-radius:10px"><div style="font-size:22px;font-weight:700;color:var(--brand-deep)">62%</div><div style="font-size:12px;color:var(--muted)">AI 会话生成占比</div></div>
+            <div style="text-align:center;padding:14px;background:var(--bg-soft);border-radius:10px"><div style="font-size:22px;font-weight:700">1.7h</div><div style="font-size:12px;color:var(--muted)">平均解决时长</div></div>
+            <div style="text-align:center;padding:14px;background:var(--bg-soft);border-radius:10px"><div style="font-size:22px;font-weight:700;color:#0c8b7a">¥38</div><div style="font-size:12px;color:var(--muted)">单工单成本（环比 -12%）</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 系统设置 ============ -->
+      <section class="page" id="p-settings">
+        <div class="page-head"><h2>系统设置</h2><span class="desc">租户档案：连锁型 · P0 配置项</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-sparkle"></i>AI 行为</div>
+            <div class="card-sub">低置信时 AI 主动建议转工单，而不是硬答</div>
+            <div class="set-row"><div class="st"><b>联网搜索兜底</b><span>知识库命中不足时联网（出网自动脱敏网点/资产信息）</span></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="set-row"><div class="st"><b>回答置信度阈值</b><span>低于阈值时引导转人工/建单 · 当前 0.72</span></div><input type="range" class="range" min="50" max="95" value="72" oninput="this.previousElementSibling.querySelector('.st span').textContent='低于阈值时引导转人工/建单 · 当前 '+(this.value/100).toFixed(2)"/></div>
+            <div class="set-row"><div class="st"><b>知识自动沉淀 · 质量门</b><span>高置信自动入库（留痕可回滚），中置信转人审</span></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="set-row"><div class="st"><b>免责话术</b><span>连锁型默认关闭；品牌型（面向消费者）强制开启</span></div><div class="switch" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="card card-pad">
+            <div class="card-title"><i class="ph ph-bell-ringing"></i>通知降级链</div>
+            <div class="card-sub">按事件配置通道递补顺序 · 全量送达留痕</div>
+            <div class="set-row"><div class="st"><b>新工单分派通知</b><span>小程序订阅消息 → 服务号模板 → 短信 → 电话外呼</span></div><button class="btn btn-sm btn-ghost">调整</button></div>
+            <div class="set-row"><div class="st"><b>用户端状态推送</b><span>H5 站内 → 服务号模板 → 短信</span></div><button class="btn btn-sm btn-ghost">调整</button></div>
+            <div class="set-row"><div class="st"><b>SLA 升级电话外呼</b><span>超时自动电话提醒调度员（P1 上线）</span></div><span class="tag tag-gray">P1</span></div>
+            <div class="set-row"><div class="st"><b>通知失败人工兜底</b><span>降级链走完未确认 → 进入工作台兜底队列</span></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- 工单详情抽屉 -->
+  <div class="drawer-mask" id="dmask" onclick="closeTicket()"></div>
+  <aside class="drawer" id="tdrawer">
+    <div class="dr-head"><b>GD20261008-0010</b><span class="tag tag-teal">待分派</span><span class="tag tag-low">低</span>
+      <button class="dr-close" style="margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--muted)" onclick="closeTicket()"><i class="ph ph-x"></i></button></div>
+    <div class="dr-body">
+      <div style="display:flex;gap:9px;margin-bottom:18px">
+        <button class="btn btn-primary" onclick="closeTicket();go2('dispatch')"><i class="ph ph-radar"></i>分派</button>
+        <button class="btn btn-ghost"><i class="ph ph-note-pencil"></i>备注</button>
+        <button class="btn btn-danger"><i class="ph ph-x-circle"></i>关闭工单</button>
+      </div>
+      <div class="dr-sec"><h4>基本信息</h4>
+        <div class="kv"><div class="k">来源</div><div class="v"><span class="src-pill"><i class="ph ph-sparkle"></i>AI 会话生成</span></div></div>
+        <div class="kv"><div class="k">类型</div><div class="v">报修 · 监控</div></div>
+        <div class="kv"><div class="k">网点</div><div class="v">天府三街店 · 成都市高新区天府三街 118 号 · 郑楠</div></div>
+        <div class="kv"><div class="k">设备</div><div class="v">海康威视 DS-2DC 球机 ×2（资产号 GB03421/GB03422）</div></div>
+        <div class="kv"><div class="k">故障描述</div><div class="v">门口球机离线，NVR 上显示红叉，近期门店装修动过线路</div></div>
+        <div class="kv"><div class="k">期望时间</div><div class="v">今天 17:00 前</div></div>
+      </div>
+      <div class="dr-sec"><h4>关联会话（AI 预填依据）</h4>
+        <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:12.5px;color:var(--muted);cursor:pointer" onclick="toast('打开关联会话原文（演示）')">「监控摄像头离线」 · 4 条消息 · AI 判断需现场排查线路<br/><span style="color:var(--brand-deep);font-weight:600">查看原文 →</span></div>
+      </div>
+      <div class="dr-sec">
+          <h4><i class="ph ph-chat-circle-dots"></i>工单协同 · 内外部沟通</h4>
+          <div id="coopAdmin">
+            <div class="coop-sys">今天 11:42 · 工程师已接单（系统事件自动同步）</div>
+            <div class="coop-msg"><div class="coop-ava" style="background:linear-gradient(135deg,#12B8A6,#0c8b7a)">李</div><div class="coop-bubble"><div class="coop-name">李成 · 工程师 <span class="coop-time">12:05</span></div>到店检查确认打印头损坏，需更换总成。今天带不了货，<b>明天上午带新件来</b>可以吗？</div></div>
+            <div class="coop-msg"><div class="coop-ava" style="background:linear-gradient(135deg,#FFB65C,#FF8A3D)">周</div><div class="coop-bubble"><div class="coop-name">周晓梅 · 店员（用户端） <span class="coop-time">12:11</span></div>可以，明天下午 2 点后店里不忙</div></div>
+            <div class="coop-msg"><div class="coop-ava" style="background:linear-gradient(135deg,#2454FF,#7B9FFF)"><i class="ph-fill ph-sparkle" style="font-size:12px"></i></div><div class="coop-bubble"><div class="coop-name">AI 助手 <span class="coop-time">12:11</span></div>已核实 GP-C80 打印头总成在库（高新仓 ×3 · 在保免费），已同步给李成。</div></div>
+            <div class="coop-msg"><div class="coop-ava" style="background:linear-gradient(135deg,#2454FF,#4d74ff)">陈</div><div class="coop-bubble"><div class="coop-name">陈璐 · 调度员（你） <span class="coop-time">12:15</span></div>好的，工单改约明天 14:00–15:00，李成记得带备用打印纸。</div></div>
+          </div>
+          <div class="coop-input">
+            <input id="coopAdminInput" placeholder="以调度员身份发起协同消息，三方可见…" onkeydown="if(event.key==='Enter')coopSend('coopAdmin','coopAdminInput')"/>
+            <button class="btn btn-sm btn-primary" onclick="coopSend('coopAdmin','coopAdminInput')"><i class="ph ph-paper-plane-tilt"></i></button>
+          </div>
+          <div class="coop-note"><i class="ph ph-info"></i>消息实时同步至用户端工单卡与工程师小程序 · 全量留痕 · 仅内部备注（P1）</div>
+      </div>
+      <div class="dr-sec"><h4>时间线</h4>
+        <div class="timeline">
+          <div class="tl-item done"><b>用户会话中提交（AI 填单 · 用户确认）</b><span class="t">10-08 09:47 · 郑楠（天府三街店）</span></div>
+          <div class="tl-item done"><b>进入待分派池 · 已通知调度组</b><span class="t">10-08 09:47 · 生态应用消息已送达</span></div>
+          <div class="tl-item"><b>等待分派</b><span class="t">已等待 25 分钟</span></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 会话历史抽屉（左栏"全部会话历史"） -->
+  <aside class="hdrawer" id="hdrawer">
+    <div class="hd-head">
+      <b style="display:flex;align-items:center;gap:8px">全部会话历史 <span class="tag tag-gray">含归档</span>
+        <button class="dr-close" style="margin-left:auto;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--muted)" onclick="closeHistory()"><i class="ph ph-x"></i></button></b>
+      <div class="cp-search" style="margin-bottom:10px"><i class="ph ph-magnifying-glass"></i><input placeholder="搜索会话 / 用户 / 网点 / 关键词"/></div>
+      <div class="hd-tabs">
+        <button class="hd-tab active" onclick="hdTab(this)">全部 21</button>
+        <button class="hd-tab" onclick="hdTab(this)">人工接入 9</button>
+        <button class="hd-tab" onclick="hdTab(this)">我的对话 10</button>
+        <button class="hd-tab" onclick="hdTab(this)">归档 12</button>
+      </div>
+    </div>
+    <div class="hd-body">
+      <div class="cp-day-label">今天</div>
+      <div class="hd-item" onclick="cpHuman();closeHistory()"><span class="hd-ic" style="background:#fff7e6;color:#d49000"><i class="ph ph-headset"></i></span><div style="flex:1;min-width:0"><b>周晓梅 · 高新万达店（转人工）</b><span>排队中 · 小票打印机故障</span></div><span class="hd-t">11:45</span></div>
+      <div class="hd-item" onclick="closeHistory();toast('打开会话（演示）')"><span class="hd-ic" style="background:var(--brand-light);color:var(--brand-deep)"><i class="ph ph-chart-line-up"></i></span><div style="flex:1;min-width:0"><b>今日运营问询</b><span>拦截率 · 排班 · 工作计划 · 8 条消息</span></div><span class="hd-t">10:32</span></div>
+      <div class="hd-item" onclick="closeHistory();toast('打开会话（演示）')"><span class="hd-ic" style="background:var(--brand-light);color:var(--brand-deep)"><i class="ph ph-package"></i></span><div style="flex:1;min-width:0"><b>配件调拨确认</b><span>打印头库存 · 4 条消息</span></div><span class="hd-t">11:02</span></div>
+      <div class="cp-day-label">昨天</div>
+      <div class="hd-item" onclick="closeHistory();toast('打开会话（演示）')"><span class="hd-ic" style="background:#e8ffea;color:#0a9f40"><i class="ph ph-check-circle"></i></span><div style="flex:1;min-width:0"><b>郑楠 · 天府三街店（人工已解决）</b><span>转工单 GD-0010 · 服务时长 4 分钟</span></div><span class="hd-t">10-07</span></div>
+      <div class="hd-item" onclick="closeHistory();toast('打开会话（演示）')"><span class="hd-ic" style="background:var(--brand-light);color:var(--brand-deep)"><i class="ph ph-receipt"></i></span><div style="flex:1;min-width:0"><b>服务商对账咨询</b><span>极速 IT 驳回单复核 · 12 条消息</span></div><span class="hd-t">10-07</span></div>
+      <div class="cp-day-label">更早</div>
+      <div class="hd-item" onclick="closeHistory();toast('打开会话（演示）')"><span class="hd-ic" style="background:var(--brand-light);color:var(--brand-deep)"><i class="ph ph-chart-scatter"></i></span><div style="flex:1;min-width:0"><b>拦截率异常分析</b><span>国庆假期回落归因</span></div><span class="hd-t">10-05</span></div>
+      <div class="hd-item" onclick="closeHistory();toast('归档会话（演示）')"><span class="hd-ic" style="background:#f2f3f5;color:var(--muted)"><i class="ph ph-archive"></i></span><div style="flex:1;min-width:0"><b>何静 · 锦华万达店（人工已解决·已归档）</b><span>归档于 10-06 · 保留 90 天</span></div><span class="hd-t">10-06</span></div>
+      <div class="hd-item" onclick="closeHistory();toast('归档会话（演示）')"><span class="hd-ic" style="background:#f2f3f5;color:var(--muted)"><i class="ph ph-archive"></i></span><div style="flex:1;min-width:0"><b>九月服务商月度对账（人工）</b><span>归档于 10-02 · 保留 90 天</span></div><span class="hd-t">09-30</span></div>
+    </div>
+    <div class="hd-foot"><i class="ph ph-info"></i> 人工会话结束 24h 后自动归档（保留 90 天）；左栏仅保留活跃与当日会话，避免列表无限增长。</div>
+  </aside>
+
+  <!-- 分派确认弹层 -->
+  <div class="modal-mask" id="mmask">
+    <div class="modal">
+      <div class="modal-head"><i class="ph-fill ph-radar"></i>确认分派</div>
+      <div class="modal-body">
+        <div class="sel-box" id="m-order"><b>GD20261008-0010</b> · 天府三街店 · 监控摄像头离线<br/><span style="color:var(--muted)">优先级 低 · 期望今天 17:00 前</span></div>
+        <div class="sel-box" id="m-eng"><b>李成</b> · 蜀维科技 · 空闲（在办 1/4）<br/><span style="color:var(--muted)">监控认证 · 距离网点 1.2km · 网点历史匹配 6 次</span></div>
+        <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;margin-bottom:6px"><i class="ph ph-bell-ringing" style="color:var(--brand)"></i>分派后将通过「订阅消息 → 服务号 → 短信」降级链通知工程师</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeDispatch()">取消</button>
+        <button class="btn btn-primary" onclick="confirmDispatch()"><i class="ph ph-paper-plane-tilt"></i>确认分派并通知</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><i class="ph-fill ph-check-circle"></i><span id="toastText"></span></div>
+</div>
+
+<script>
+function go(node){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  node.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+node.dataset.p).classList.add('active');
+}
+function go2(pid){
+  const node=document.querySelector(`.nav-item[data-p="${pid}"]`);if(node)go(node);
+}
+let toastTimer;
+function toast(t){
+  const el=document.getElementById('toast');
+  document.getElementById('toastText').textContent=t;
+  el.classList.add('show');clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+function openTicket(){document.getElementById('tdrawer').classList.add('open');document.getElementById('dmask').classList.add('open');}
+function closeTicket(){document.getElementById('tdrawer').classList.remove('open');document.getElementById('dmask').classList.remove('open');}
+/* 分派流程 */
+let dispatchCtx=null;
+function openDispatch(btn,eng){
+  const card=btn.closest('.dcard');
+  dispatchCtx={card,no:card.dataset.no,eng:eng||card.dataset.eng};
+  document.getElementById('m-order').innerHTML=`<b>${dispatchCtx.no}</b> · ${card.querySelector('.dcard-title').textContent}<br/><span style="color:var(--muted)">优先级与期望时间以工单为准</span>`;
+  const engMap={'李成':'<b>李成</b> · 蜀维科技 · 空闲（在办 1/4）<br/><span style="color:var(--muted)">监控认证 · 距离 1.2km · 网点历史匹配 6 次</span>','王强':'<b>王强</b> · 蜀维科技 · 忙碌（在办 3/4）<br/><span style="color:var(--muted)">厨电/制冷认证 · 明日档期空闲</span>','李明杰':'<b>李明杰</b> · 内部 IT · 空闲（在办 1/3）<br/><span style="color:var(--muted)">内容发布权限 · 本周 3 个空档</span>'};
+  document.getElementById('m-eng').innerHTML=engMap[dispatchCtx.eng]||'<b>请选择工程师</b>';
+  document.getElementById('mmask').classList.add('open');
+}
+function closeDispatch(){document.getElementById('mmask').classList.remove('open');}
+function confirmDispatch(){
+  closeDispatch();
+  const no=dispatchCtx.no,eng=dispatchCtx.eng;
+  dispatchCtx.card.style.transition='all .3s';dispatchCtx.card.style.opacity='0';dispatchCtx.card.style.transform='translateX(20px)';
+  setTimeout(()=>dispatchCtx.card.remove(),320);
+  toast(`${no} 已分派给 ${eng}，通知通过降级链送达`);
+  const cnt=document.querySelector('.nav-item[data-p="dispatch"] .cnt');
+  const v=parseInt(cnt.textContent||'0');if(v>1)cnt.textContent=v-1;else cnt.remove();
+}
+/* 知识库审核 */
+function approve(b){b.closest('.draft-review').style.opacity='.45';b.outerHTML='<span class="tag tag-low">已入库</span>';toast('知识已入库，AI 即刻可用于回答');}
+function reject(b){b.closest('.draft-review').style.opacity='.45';b.outerHTML='<span class="tag tag-gray">已暂缓</span>';}
+function revoke(b){b.closest('.draft-review').style.opacity='.45';b.outerHTML='<span class="tag tag-high">已回滚</span>';toast('已回滚，该知识不再被 AI 引用');}
+
+/* ===== AI 工作台交互 ===== */
+function cpFilter(f){
+  document.querySelectorAll('.cp-tab').forEach(t=>t.classList.toggle('active',t.dataset.f===f));
+  document.querySelectorAll('#cpStream > *').forEach(n=>{
+    const isCard=n.classList.contains('cp-card');
+    const isTodo=n.classList.contains('todo');
+    const isMine=n.classList.contains('cp-msg');
+    n.style.display=(f==='all'||(f==='todo'&&isCard&&isTodo)||(f==='agent'&&isCard)||(f==='mine'&&isMine))?'':'none';
+  });
+  const st=document.getElementById('cpStream');st.scrollTop=0;
+}
+function cpQuick(btn){const i=document.getElementById('cpInput');i.value=btn.textContent.trim();i.focus();i.dispatchEvent(new Event('input'));}
+function cpNew(){const i=document.getElementById('cpInput');i.value='';i.focus();toast('新的问询已开启，直接输入你的问题');}
+function cpSend(){
+  const inp=document.getElementById('cpInput');const txt=inp.value.trim();if(!txt)return;inp.value='';inp.style.height='auto';
+  const st=document.getElementById('cpStream');
+  /* 指令模式：频道/工单工作台内 → AI 生成操作确认卡 */
+  const tpl=CONFIRM_TPL[currentAgent];
+  if(tpl){
+    const q=document.createElement('div');
+    q.className='cp-msg mine';
+    q.innerHTML=`<div class="cp-q"><span class="cp-user-ava">陈</span><div class="cp-q-bubble"><i class="ph ph-magic-wand" style="color:var(--brand);font-size:13px"></i> ${txt.replace(/</g,'&lt;')}</div></div>`;
+    st.appendChild(q);st.scrollTop=st.scrollHeight;
+    setTimeout(()=>{
+      const card=document.createElement('div');
+      card.className='cp-card todo';
+      card.innerHTML=`<div class="cp-card-hd"><span class="cp-ava ${tpl.cls}"><i class="${tpl.ic}"></i></span><b>${tpl.name} · ${tpl.title}</b><span class="cp-time">刚刚</span><span class="cp-chip warn">待确认</span></div>
+      <div class="cp-card-bd"><div class="cp-line">${tpl.body}</div><div class="cp-evidence"><i class="ph ph-sparkle"></i><span>${tpl.ev}</span></div></div>
+      <div class="cp-card-ft"><button class="btn btn-sm btn-primary" onclick='tkConfirm(this,"${tpl.done}")'><i class="ph ph-check"></i>确认执行</button><button class="btn btn-sm btn-ghost" onclick="cpCancel(this)">取消</button></div>`;
+      st.appendChild(card);st.scrollTop=st.scrollHeight;
+      toast('AI 已解析指令并生成操作预览，请确认');
+    },700);
+    return;
+  }
+  const q=document.createElement('div');
+  q.className='cp-msg mine';
+  q.innerHTML=`<div class="cp-q"><span class="cp-user-ava">陈</span><div class="cp-q-bubble">${txt.replace(/</g,'&lt;')}</div></div>
+  <div class="cp-a"><div class="cp-a-name"><span class="cp-ava ai"><i class="ph-fill ph-sparkle"></i></span>小云 · 管理助手 <span class="cp-src"><i class="ph ph-circle-notch"></i>检索中</span></div>
+  <div class="cp-a-body" style="color:var(--muted)">正在查询实时运营数据与知识库…</div></div>`;
+  st.appendChild(q);st.scrollTop=st.scrollHeight;
+  setTimeout(()=>{
+    q.querySelector('.cp-a-body').innerHTML=`<p>演示原型在此仅呈现固定剧本（今日概览 / 工程师表现 / 明日计划，见上方时间流）。正式版将基于租户实时数据作答并附来源。</p>
+    <div class="cp-follow"><button class="chip" onclick="cpQuick(this)">今日概览</button><button class="chip" onclick="cpQuick(this)">明日计划</button></div>`;
+    q.querySelector('.cp-src').innerHTML='<i class="ph ph-database"></i>实时数据';
+    st.scrollTop=st.scrollHeight;
+  },900);
+}
+function cpResolve(btn,msg){
+  const card=btn.closest('.cp-card');
+  const wasTodo=card.classList.contains('todo');
+  card.classList.remove('todo');card.classList.add('resolved');
+  card.querySelector('.cp-card-ft').innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#0a9f40;font-weight:600"><i class="ph-fill ph-check-circle"></i>${msg}</span>`;
+  if(wasTodo){
+    ['cpTodoN','rpTodo','copilotCnt'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){const v=parseInt(el.textContent);if(v>1){el.textContent=v-1;}else{el.remove();}}
+    });
+  }
+  toast(msg);
+}
+/* AI 工作台输入框自适应 */
+(function(){
+  const inp=document.getElementById('cpInput');
+  inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,110)+'px';});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();cpSend();}});
+})();
+/* ===== 人工服务台（用户端转人工承接） ===== */
+function cpHuman(){
+  document.getElementById('cpHuman').classList.add('on');
+  ['cpHead','cpStream','cpComposer'].forEach(id=>document.getElementById(id).style.display='none');
+  document.querySelectorAll('.cp-conv,.cp-agent').forEach(n=>n.classList.remove('active'));
+  document.getElementById('hpQueueItem').classList.add('active');
+  switchRight('rpHuman');
+  const st=document.getElementById('hpStream');st.scrollTop=st.scrollHeight;
+}
+function cpBack(){
+  document.getElementById('cpHuman').classList.remove('on');
+  ['cpHead','cpStream','cpComposer'].forEach(id=>document.getElementById(id).style.display='');
+  document.getElementById('hpQueueItem').classList.remove('active');
+  switchRight('rpCommand');
+  cpExitMode();
+}
+/* 频道/工单指令模式：工单操作融入 Agent 频道 */
+let currentAgent=null;
+const CP_CHIPS_DEFAULT=document.getElementById('cpChips').innerHTML;
+const CP_PLACEHOLDER_DEFAULT=document.getElementById('cpInput').placeholder;
+const MODE_CHIPS={
+  ticket:['把 GD-0010 派给最近的工程师','催办一下锦华那单','改派给王强'],
+  dispatch:['把 GD-0010 派给最近的工程师','改派给王强'],
+  sla:['催办 GD-0007','改派他人'],
+  kb:['通过那条待审知识','查看待审草稿'],
+  visit:['为差评生成回访工单']
+};
+function cpEnterMode(key,title){
+  currentAgent=key;
+  document.getElementById('cpInput').placeholder=title;
+  document.getElementById('cpChips').innerHTML=MODE_CHIPS[key].map(c=>`<button class="chip" onclick="cpQuick(this)">${c}</button>`).join('')+
+    `<span class="cp-hint"><i class="ph ph-magic-wand"></i>指令模式：AI 生成操作确认卡，确认后执行</span>`;
+}
+function cpExitMode(){
+  currentAgent=null;
+  document.getElementById('cpInput').placeholder=CP_PLACEHOLDER_DEFAULT;
+  document.getElementById('cpChips').innerHTML=CP_CHIPS_DEFAULT;
+}
+function cpTicketHub(){
+  document.querySelectorAll('.cp-conv,.cp-agent').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tkHub').classList.add('active');
+  document.querySelectorAll('.cp-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#cpStream > *').forEach(n=>{
+    n.style.display=n.classList.contains('cp-card')?'':'none';
+  });
+  cpEnterMode('ticket','对工单下指令，如：把 GD-0010 派给最近的工程师…（回车发送）');
+  switchRight('rpTicket');
+  document.getElementById('cpStream').scrollTop=0;
+}
+/* AI 操作确认卡模板（对话式工单操作） */
+const CONFIRM_TPL={
+  ticket:{name:'自动派单 Agent',ic:'ph-fill ph-radar',cls:'dp',title:'操作确认 · 分派工单',
+    body:'GD20261008-0010（天府三街店 · 监控离线）→ <b>李成（蜀维科技）</b>',
+    ev:'依据：距离 1.2km 最近 · 在办 1/4 负载最低 · 监控认证 · 该网点历史完成 6 次 · 置信 0.87',
+    done:'已分派 GD-0010 → 李成，通知经降级链送达'},
+  dispatch:{name:'自动派单 Agent',ic:'ph-fill ph-radar',cls:'dp',title:'操作确认 · 分派工单',
+    body:'GD20261008-0010（天府三街店 · 监控离线）→ <b>李成（蜀维科技）</b>',
+    ev:'依据：距离 1.2km 最近 · 在办 1/4 负载最低 · 监控认证 · 该网点历史完成 6 次 · 置信 0.87',
+    done:'已分派 GD-0010 → 李成，通知经降级链送达'},
+  sla:{name:'SLA 升级 Agent',ic:'ph-fill ph-warning-octagon',cls:'sla',title:'操作确认 · 催办',
+    body:'GD-0007（锦华万达店 · 收银黑屏）→ 短信 + 电话提醒 <b>李明杰</b>',
+    ev:'距响应 SLA 超时还剩 10 分钟；催办后若 5 分钟内未接单将自动建议改派',
+    done:'已催办：短信送达 + 电话外呼已发起'},
+  kb:{name:'知识沉淀 Agent',ic:'ph-fill ph-database',cls:'kb',title:'操作确认 · 知识入库',
+    body:'《点餐屏触控失灵 · 排查思路》→ 入库并即时生效，可回滚',
+    ev:'结单摘要 + 工程师实测记录 · 待审置信 0.68',
+    done:'知识已入库，AI 即刻可引用（留痕可回滚）'},
+  visit:{name:'满意度回访 Agent',ic:'ph-fill ph-chat-centered-text',cls:'vs',title:'操作确认 · 生成回访工单',
+    body:'双楠店 · 电子秤（差评）→ 高优先级回访工单 → <b>赵鹏</b>',
+    ev:'差评原文："修完次日又不对" · 建议携带备用传感器上门',
+    done:'已生成回访工单 GD20261008-0018（高优先级 · 赵鹏）'}
+};
+function tkConfirm(btn,msg){
+  const card=btn.closest('.cp-card');
+  card.classList.remove('todo');card.classList.add('resolved');
+  card.querySelector('.cp-card-ft').innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#0a9f40;font-weight:600"><i class="ph-fill ph-check-circle"></i>${msg}</span>`;
+  toast(msg);
+}
+function cpCancel(btn){
+  const card=btn.closest('.cp-card');
+  card.classList.remove('todo');card.classList.add('resolved');
+  card.querySelector('.cp-card-ft').innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)"><i class="ph ph-x-circle"></i>已取消</span>`;
+}
+/* 右栏上下文切换 */
+function switchRight(id){
+  ['rpCommand','rpHuman','rpAgent','rpTicket'].forEach(x=>{
+    document.getElementById(x).style.display=(x===id)?'':'none';
+  });
+}
+/* Agent 频道视图：右栏运行详情 + 中栏按频道过滤 */
+const AGENT_DATA={
+  dispatch:{name:'自动派单 Agent',ic:'ph-fill ph-radar',cls:'dp',mode:'warn',
+    stats:[['3','今日建议'],['2','已采纳'],['1','待确认'],['4 秒','平均决策耗时']],
+    logs:[['11:38','GD-0012 → 李成 · 陈璐已批准 · 通知送达','ok'],['09:47','GD-0010 → 李成 · 置信 0.87 · 待确认','warn'],['09:12','GD-0011 → 王强 · 陈璐调整后批准','ok']],
+    policy:'决策依据：距离 40% · 负载 30% · 技能认证 20% · 历史匹配 10%',
+    human:'每单必审（批准后执行）· P1 可配置低优先级白名单自动执行'},
+  kb:{name:'知识沉淀 Agent',ic:'ph-fill ph-database',cls:'kb',mode:'on',
+    stats:[['4','自动入库'],['1','待人审'],['41','累计入库'],['0','回滚']],
+    logs:[['09:00','《电子秤传感器校准》高置信自动入库','ok'],['09:00','《点餐屏排查思路》中置信转人审','warn'],['昨日','沉淀知识被 AI 引用 63 次','ok']],
+    policy:'质量门：置信 ≥0.85 自动入库（留痕可回滚），0.6–0.85 转人审',
+    human:'自动入库可回滚 · 人审队列在「知识库」页处理'},
+  sla:{name:'SLA 升级 Agent',ic:'ph-fill ph-warning-octagon',cls:'sla',mode:'warn',
+    stats:[['1','今日预警'],['0','升级外呼'],['96%','SLA 达成'],['10min','剩余倒计时']],
+    logs:[['10:20','GD-0007 分派 20 分钟未接单 → 预警调度员','warn'],['昨日','2 次提醒均在时限内解决','ok']],
+    policy:'响应 SLA 30 分钟 · 解决 SLA 按优先级 4/8/24 小时',
+    human:'预警仅提醒不自动改派（P1 可授权自动改派+电话外呼）'},
+  visit:{name:'满意度回访 Agent',ic:'ph-fill ph-chat-centered-text',cls:'vs',mode:'on',
+    stats:[['9','今日回访'],['8','满意'],['1','差评'],['4.8','均分']],
+    logs:[['11:30','双楠店差评 → 建议生成回访工单','warn'],['10:00','8 条满意已记录并计入服务商评分','ok']],
+    policy:'结单 2 小时后自动回访（小程序消息 → 短信）',
+    human:'差评必转人工处理 · 好评自动记录'}
+};
+function cpAgentView(node){
+  const key=node.dataset.agent;
+  document.querySelectorAll('.cp-conv,.cp-agent').forEach(n=>n.classList.remove('active'));
+  node.classList.add('active');
+  document.querySelectorAll('.cp-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#cpStream > *').forEach(n=>{
+    n.style.display=n.classList.contains('cp-card')&&n.dataset.agent===key?'':'none';
+  });
+  renderRpAgent(key);
+  switchRight('rpAgent');
+  cpEnterMode(key,`对「${AGENT_DATA[key].name.replace(' Agent','')}」频道下指令，如：把这单派给最近的工程师…`);
+  document.getElementById('cpStream').scrollTop=0;
+}
+function renderRpAgent(key){
+  const d=AGENT_DATA[key];
+  document.getElementById('rpAgent').innerHTML=`
+    <div class="rpanel">
+      <div class="rp-title"><span class="cp-ava ${d.cls}" style="width:24px;height:24px;font-size:12px"><i class="${d.ic}"></i></span>${d.name}<span class="cp-dot ${d.mode}" style="margin-left:auto"></span></div>
+      <div class="rp-kpis">
+        ${d.stats.map(s=>`<div><b class="c">${s[0]}</b><span>${s[1]}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="rpanel">
+      <div class="rp-title"><i class="ph ph-timeline"></i>今日执行留痕</div>
+      ${d.logs.map(l=>`<div class="rp-item" style="cursor:default"><i class="ph ${l[2]==='ok'?'ph-check-circle':'ph-clock-user'}" style="color:${l[2]==='ok'?'#0a9f40':'#d49000'}"></i><span style="font-size:11.5px;line-height:1.5">${l[1]}<em style="display:block;font-style:normal;color:var(--muted);font-size:10px">${l[0]}</em></span></div>`).join('')}
+    </div>
+    <div class="rpanel">
+      <div class="rp-title"><i class="ph ph-sliders-horizontal"></i>决策策略</div>
+      <div style="font-size:11.5px;color:var(--ink);line-height:1.7">${d.policy}</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-top:7px;padding-top:7px;border-top:1px dashed var(--line)"><i class="ph ph-handshake" style="color:var(--brand)"></i> ${d.human}</div>
+      <button class="rp-link" onclick="toast('策略配置与白名单：P1 开放')">调整策略 <i class="ph ph-arrow-right"></i></button>
+    </div>
+    <button class="cp-history-btn" style="margin-top:0" onclick="cpBack();cpFilter('all')"><i class="ph ph-arrow-left"></i>返回指挥中心</button>`;
+}
+let hpLiveTimer=[];
+function hpAccept(){
+  const btn=document.getElementById('hpAcceptBtn');
+  btn.outerHTML='<span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#0a9f40;font-weight:650"><i class="ph-fill ph-record"></i>服务中 <span id="hpServe">00:01</span></span>';
+  document.getElementById('hpState').innerHTML='服务中 · 已接入';
+  document.getElementById('hpState').style.color='#0a9f40';
+  const q=document.getElementById('hpQueueItem');
+  q.classList.remove('queue');q.querySelector('.cp-side-cnt')?.remove();
+  q.querySelector('span:last-of-type')?.remove();
+  q.querySelector('.cp-unread')?.remove();
+  q.querySelector('b').textContent='周晓梅 · 高新万达店（服务中）';
+  q.querySelector('.cp-side-cnt');
+  const live=document.getElementById('hpLive');
+  const scroll=()=>{const s=document.getElementById('hpStream');s.scrollTop=s.scrollHeight;};
+  hpLiveTimer.push(setTimeout(()=>{
+    live.innerHTML=`<div class="cp-sys">11:47 · 你已接入（调度员 陈璐）</div>
+    <div class="cp-msg">
+      <div class="cp-a">
+        <div class="cp-a-name"><span class="ava-human" style="background:linear-gradient(135deg,#2454FF,#7B9FFF)"><i class="ph ph-headset"></i></span>陈璐 · 调度员（你） <span class="hp-draft-flag"><i class="ph-fill ph-sparkle"></i>AI 辅助草拟</span></div>
+        <div class="cp-q" style="justify-content:flex-start"><div class="hp-bubble" style="border-radius:13px 13px 4px 13px">您好周女士，我是调度员陈璐，抱歉让您久等。已看到完整对话——大概率是打印头故障需要上门更换。高新万达店在李成师傅的服务区，他 <b>12:40 前</b>到店，午高峰前搞定，可以吗？</div></div>
+      </div>
+    </div>`;
+    scroll();toast('已接入会话（演示）· 首条回复由 AI 草拟，你确认发出');
+  },400));
+  hpLiveTimer.push(setTimeout(()=>{
+    live.insertAdjacentHTML('beforeend',`<div class="cp-msg">
+      <div class="cp-a">
+        <div class="cp-a-name"><span class="ava-human"><i class="ph-fill ph-headset"></i></span>周晓梅 · 用户端</div>
+        <div class="cp-q" style="justify-content:flex-start"><div class="hp-bubble" style="border-radius:13px 13px 4px 13px">12:40 可以！中午出单高峰前弄好就行</div></div>
+      </div>
+    </div>`);
+    scroll();
+  },2000));
+  let t=1;
+  hpLiveTimer.push(setInterval(()=>{
+    const el=document.getElementById('hpServe');
+    if(!el)return;t++;
+    el.textContent=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+  },1000));
+}
+function hpEnd(){
+  hpLiveTimer.forEach(id=>{clearTimeout(id);clearInterval(id);});hpLiveTimer=[];
+  toast('会话已结束并转回 AI · 满意度评价已发送（演示）');
+  const q=document.getElementById('hpQueueItem');
+  if(q){q.style.display='none';}
+  const cnt=document.getElementById('hpCnt');
+  if(cnt){cnt.remove();}
+  document.getElementById('hpEmpty').style.display='flex';
+  setTimeout(cpBack,400);
+}
+function hpQuick(btn){const i=document.getElementById('hpInput');i.value=btn.textContent.trim();i.focus();}
+/* 会话历史管理 */
+function toggleFold(node,id){
+  node.classList.toggle('open');
+  document.getElementById(id).classList.toggle('open');
+}
+function toggleGrp(node,id){
+  const grp=document.getElementById(id);
+  const t=node.querySelector('.grp-toggle');
+  const closing=grp.style.display!=='none';
+  grp.style.display=closing?'none':'';
+  t.innerHTML=closing?'<i class="ph ph-caret-right"></i>':'<i class="ph ph-caret-down"></i>';
+}
+function toggleMyHist(){
+  const grp=document.getElementById('myHistGrp');
+  const fold=document.getElementById('myHistFold');
+  const opening=!grp.classList.contains('open');
+  grp.classList.toggle('open',opening);
+  fold.innerHTML=opening
+    ?'<i class="ph ph-caret-up"></i>收起'
+    :'<i class="ph ph-caret-down"></i>展开';
+}
+
+function openHistory(){document.getElementById('hdrawer').classList.add('open');document.getElementById('dmask').classList.add('open');}
+function closeHistory(){document.getElementById('hdrawer').classList.remove('open');if(!document.getElementById('tdrawer').classList.contains('open'))document.getElementById('dmask').classList.remove('open');}
+function hdTab(btn){btn.parentElement.querySelectorAll('.hd-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+/* 工单协同区：发送消息（演示） */
+function coopSend(listId,inputId){
+  const inp=document.getElementById(inputId);const txt=inp.value.trim();if(!txt)return;inp.value='';
+  const t=new Date();const hm=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+  document.getElementById(listId).insertAdjacentHTML('beforeend',`<div class="coop-msg"><div class="coop-ava" style="background:linear-gradient(135deg,#2454FF,#4d74ff)">陈</div><div class="coop-bubble"><div class="coop-name">陈璐 · 调度员（你） <span class="coop-time">${hm}</span></div>${txt.replace(/</g,'&lt;')}</div></div>`);
+  const box=inp.closest('.dr-body');if(box)box.scrollTop=box.scrollHeight;
+  toast('协同消息已发送 · 用户端与工程师端已收到通知');
+}
+function hpSend(){
+  const inp=document.getElementById('hpInput');const txt=inp.value.trim();if(!txt)return;inp.value='';inp.style.height='auto';
+  document.getElementById('hpLive').insertAdjacentHTML('beforeend',`<div class="cp-msg">
+    <div class="cp-a"><div class="cp-a-name"><span class="ava-human" style="background:linear-gradient(135deg,#2454FF,#7B9FFF)"><i class="ph ph-headset"></i></span>陈璐 · 调度员（你）</div>
+    <div class="cp-q" style="justify-content:flex-start"><div class="hp-bubble" style="border-radius:13px 13px 4px 13px">${txt.replace(/</g,'&lt;')}</div></div></div></div>`);
+  const s=document.getElementById('hpStream');s.scrollTop=s.scrollHeight;
+}
+(function(){
+  const inp=document.getElementById('hpInput');
+  inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,110)+'px';});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();hpSend();}});
+})();
+</script>
+</body>
+</html>
